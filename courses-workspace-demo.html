@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Systems II - 521F_SP26_ON</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a5f;
+            --secondary-blue: #2c5282;
+            --accent-gold: #d4a84b;
+            --light-gold: #f6e9c9;
+            --bg-cream: #faf8f5;
+            --bg-sidebar: #f5f3ef;
+            --text-dark: #2d3748;
+            --text-muted: #718096;
+            --border-light: #e2e0dc;
+            --white: #ffffff;
+            --current-week-bg: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            --hover-bg: #eceae6;
+            --link-blue: #2b6cb0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-cream);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: var(--current-week-bg);
+            padding: 1.25rem 2rem;
+            padding-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 8px rgba(30, 58, 95, 0.15);
+            position: relative;
+            z-index: 100;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--white);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--primary-blue);
+        }
+
+        .header-text h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--white);
+            letter-spacing: 0.5px;
+        }
+
+        .header-text p {
+            font-size: 0.875rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 2px;
+        }
+
+        /* Top Menu Bar */
+        .top-menu-bar {
+            position: absolute;
+            bottom: 0;
+            right: 1.5rem;
+            display: flex;
+            align-items: flex-end;
+            gap: 0;
+        }
+
+        .top-menu-item {
+            position: relative;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.9);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .top-menu-item:hover {
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .top-menu-item::after {
+            content: '|';
+            position: absolute;
+            right: 0;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .top-menu-item:last-child::after {
+            display: none;
+        }
+
+        .top-menu-item.has-dropdown .menu-text::after {
+            content: ' ▾';
+            font-size: 0.65rem;
+            opacity: 0.7;
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 180px;
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(5px);
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        .top-menu-item:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.15s ease;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: var(--bg-cream);
+            color: var(--link-blue);
+        }
+
+        .dropdown-menu a svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+            fill: var(--text-muted);
+        }
+
+        /* Progress indicator in header */
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50%;
+            height: 3px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-gold);
+            width: 25%;
+            transition: width 0.5s ease;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-light);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--white);
+        }
+
+        .sidebar-header h2 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+        }
+
+        /* Week Items */
+        .week-item {
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .week-header {
+            padding: 0.85rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--white);
+            position: relative;
+        }
+
+        .week-header:hover {
+            background: var(--hover-bg);
+        }
+
+        .week-header.expanded {
+            background: var(--hover-bg);
+        }
+
+        /* Current Week Indicator */
+        .current-week-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: var(--current-week-bg);
+            color: var(--white);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: auto;
+            animation: pulse-subtle 2s ease-in-out infinite;
+        }
+
+        .current-week-badge svg {
+            width: 10px;
+            height: 10px;
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(30, 58, 95, 0.4); }
+            50% { box-shadow: 0 0 0 4px rgba(30, 58, 95, 0); }
+        }
+
+        .week-toggle {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .week-toggle svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--text-muted);
+        }
+
+        .week-header.expanded .week-toggle {
+            transform: rotate(90deg);
+        }
+
+        .week-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .week-dates {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-left: 0.25rem;
+        }
+
+        /* Sub Items */
+        .week-subitems {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: var(--bg-sidebar);
+        }
+
+        .week-subitems.expanded {
+            max-height: 300px;
+        }
+
+        .sub-item {
+            padding: 0.6rem 1.5rem 0.6rem 3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sub-item:hover {
+            background: var(--white);
+            border-left-color: var(--accent-gold);
+        }
+
+        .sub-item.active {
+            background: var(--white);
+            border-left-color: var(--primary-blue);
+        }
+
+        .sub-item-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sub-item-icon svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .sub-item-icon.content { background: #e6f2ff; }
+        .sub-item-icon.content svg { fill: #2b6cb0; }
+        
+        .sub-item-icon.discussions { background: #f0fff4; }
+        .sub-item-icon.discussions svg { fill: #276749; }
+        
+        .sub-item-icon.assignments { background: #fef5e7; }
+        .sub-item-icon.assignments svg { fill: #c05621; }
+        
+        .sub-item-icon.quizzes { background: #faf5ff; }
+        .sub-item-icon.quizzes svg { fill: #6b46c1; }
+
+        .sub-item-text {
+            font-size: 0.85rem;
+            color: var(--text-dark);
+        }
+
+        /* Content Frame */
+        .content-frame {
+            flex: 1;
+            background: var(--white);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .content-wrapper {
+            padding: 2.5rem 3rem;
+            max-width: 900px;
+        }
+
+        .content-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .content-breadcrumb span {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .content-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .content-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        /* Content Cards */
+        .content-section {
+            margin-bottom: 2rem;
+        }
+
+        .content-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .content-card {
+            background: var(--bg-cream);
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            border: 1px solid var(--border-light);
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .content-card:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 4px 12px rgba(212, 168, 75, 0.1);
+        }
+
+        .content-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .content-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .content-card .meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .content-card .meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .content-card .meta svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--text-muted);
+        }
+
+        /* Overlay Modal */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(30, 58, 95, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .overlay-content {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            width: 90%;
+            max-height: 85vh;
+            overflow: hidden;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .overlay.active .overlay-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .overlay-header {
+            padding: 1.25rem 1.5rem;
+            background: var(--primary-blue);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .overlay-header h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .overlay-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .overlay-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .overlay-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: calc(85vh - 70px);
+        }
+
+        /* Contact Cards Grid */
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .contact-card {
+            background: var(--bg-cream);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .contact-card:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 4px 12px rgba(212, 168, 75, 0.15);
+        }
+
+        .contact-card.instructor {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #f8f6f3 0%, #f0ede8 100%);
+            border-color: var(--accent-gold);
+        }
+
+        .contact-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .contact-avatar svg {
+            width: 30px;
+            height: 30px;
+            fill: var(--text-muted);
+        }
+
+        .contact-avatar.instructor-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-blue);
+        }
+
+        .contact-avatar.instructor-avatar svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--white);
+        }
+
+        .contact-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .contact-info .role {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        /* Grades Table */
+        .grades-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .grades-table th,
+        .grades-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .grades-table th {
+            background: var(--bg-sidebar);
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .grades-table tr:hover td {
+            background: var(--bg-cream);
+        }
+
+        .grades-table .grade-cell {
+            font-weight: 600;
+        }
+
+        .grade-a { color: #276749; }
+        .grade-b { color: #2b6cb0; }
+        .grade-c { color: #c05621; }
+        .grade-pending { color: var(--text-muted); font-style: italic; }
+
+        /* Syllabus Styles */
+        .syllabus-content {
+            line-height: 1.7;
+        }
+
+        .syllabus-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .syllabus-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .syllabus-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-gold);
+            display: inline-block;
+        }
+
+        .syllabus-section p {
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .syllabus-section ul {
+            margin-left: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .syllabus-section ul li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .syllabus-table {
+            width: 100%;
+            max-width: 500px;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .syllabus-table td {
+            padding: 0.5rem 1rem 0.5rem 0;
+            vertical-align: top;
+        }
+
+        .syllabus-table td:first-child {
+            width: 40%;
+            color: var(--text-muted);
+        }
+
+        .syllabus-table td:last-child {
+            color: var(--text-dark);
+        }
+
+        .syllabus-table.grading-table,
+        .syllabus-table.grade-scale {
+            max-width: 300px;
+            background: var(--bg-cream);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .syllabus-table.grading-table td,
+        .syllabus-table.grade-scale td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .syllabus-table.grading-table tr:last-child td,
+        .syllabus-table.grade-scale tr:last-child td {
+            border-bottom: none;
+        }
+
+        .syllabus-table .total-row td {
+            background: var(--primary-blue);
+            color: var(--white) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+            }
+            .content-wrapper {
+                padding: 1.5rem;
+            }
+            .top-menu-bar {
+                right: 0.5rem;
+            }
+            .top-menu-item {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+        </div>
+        <div class="header-text">
+            <h1>Web Systems II</h1>
+            <p>521F_SP26_ON</p>
+        </div>
+
+        <!-- Top Menu Bar -->
+        <nav class="top-menu-bar">
+            <div class="top-menu-item" onclick="openOverlay('contacts')">Contact Information</div>
+            <div class="top-menu-item" onclick="openOverlay('syllabus')">Syllabus</div>
+            <div class="top-menu-item has-dropdown">
+                <span class="menu-text">Grades</span>
+                <div class="dropdown-menu">
+                    <a href="#" onclick="openOverlay('grades'); return false;">View My Grades</a>
+                    <a href="#" onclick="openOverlay('grades'); return false;">Grade Summary</a>
+                    <a href="#">Grade Scale</a>
+                </div>
+            </div>
+            <div class="top-menu-item has-dropdown">
+                <span class="menu-text">Tools</span>
+                <div class="dropdown-menu">
+                    <a href="#">Attendance</a>
+                    <a href="#">Awards</a>
+                    <a href="#">Calendar</a>
+                    <a href="#">Checklist</a>
+                    <a href="#">Class Progress</a>
+                    <a href="#">ePortfolio</a>
+                    <a href="#">FalconMail</a>
+                    <a href="#">FAQ</a>
+                    <a href="#">Groups</a>
+                    <a href="#">Handbook</a>
+                    <a href="#">Links</a>
+                    <a href="#">Rubrics</a>
+                    <a href="#">Self Assessments</a>
+                    <a href="#">Surveys</a>
+                    <a href="#">Video Assignment</a>
+                    <a href="#">Virtual Classroom</a>
+                </div>
+            </div>
+            <div class="top-menu-item has-dropdown">
+                <span class="menu-text">Help</span>
+                <div class="dropdown-menu">
+                    <a href="#">Student Support</a>
+                    <a href="#">Technical Help</a>
+                    <a href="#">Accessibility</a>
+                    <a href="#">FAQs</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Course Schedule</h2>
+            </div>
+            <div id="weekMenu"></div>
+        </nav>
+
+        <main class="content-frame">
+            <div class="content-wrapper" id="contentArea">
+                <!-- Content loaded dynamically -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Contact Information Overlay -->
+    <div class="overlay" id="contactsOverlay">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h2>Contact Information</h2>
+                <button class="overlay-close" onclick="closeOverlay('contacts')">&times;</button>
+            </div>
+            <div class="overlay-body">
+                <div class="contacts-grid">
+                    <!-- Instructor Card -->
+                    <div class="contact-card instructor">
+                        <div class="contact-avatar instructor-avatar">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <p class="role">Instructor</p>
+                            <h4>Dr. Sarah Mitchell</h4>
+                            <p>smitchell@daytonastate.edu</p>
+                            <p>Office: Building A, Room 215</p>
+                        </div>
+                    </div>
+                    <!-- Student Cards -->
+                    <div class="contact-card">
+                        <div class="contact-avatar">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <p class="role">Student</p>
+                            <h4>James Anderson</h4>
+                            <p>janderson@students.daytonastate.edu</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-avatar">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <p class="role">Student</p>
+                            <h4>Maria Rodriguez</h4>
+                            <p>mrodriguez@students.daytonastate.edu</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-avatar">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <p class="role">Student</p>
+                            <h4>David Chen</h4>
+                            <p>dchen@students.daytonastate.edu</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-avatar">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <p class="role">Student</p>
+                            <h4>Emily Thompson</h4>
+                            <p>ethompson@students.daytonastate.edu</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-avatar">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <p class="role">Student</p>
+                            <h4>Michael Williams</h4>
+                            <p>mwilliams@students.daytonastate.edu</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-avatar">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <p class="role">Student</p>
+                            <h4>Jessica Martinez</h4>
+                            <p>jmartinez@students.daytonastate.edu</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-avatar">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <p class="role">Student</p>
+                            <h4>Christopher Brown</h4>
+                            <p>cbrown@students.daytonastate.edu</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-avatar">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <p class="role">Student</p>
+                            <h4>Ashley Davis</h4>
+                            <p>adavis@students.daytonastate.edu</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-avatar">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <p class="role">Student</p>
+                            <h4>Daniel Johnson</h4>
+                            <p>djohnson@students.daytonastate.edu</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-avatar">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="contact-info">
+                            <p class="role">Student</p>
+                            <h4>Sarah Wilson</h4>
+                            <p>swilson@students.daytonastate.edu</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grades Overlay -->
+    <div class="overlay" id="gradesOverlay">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h2>Grades - Web Systems II 521F SP26 ON - Daytona State College</h2>
+                <button class="overlay-close" onclick="closeOverlay('grades')">&times;</button>
+            </div>
+            <div class="overlay-body">
+                <div class="grades-table-wrapper">
+                    <table class="grades-table">
+                        <thead>
+                            <tr>
+                                <th>Assignment</th>
+                                <th>Due Date</th>
+                                <th>Submitted</th>
+                                <th>Points</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Week 1 Discussion</td>
+                                <td>Jan 24</td>
+                                <td>Jan 23</td>
+                                <td>25/25</td>
+                                <td class="grade-cell grade-a">A</td>
+                            </tr>
+                            <tr>
+                                <td>Week 1 Quiz</td>
+                                <td>Jan 24</td>
+                                <td>Jan 22</td>
+                                <td>18/20</td>
+                                <td class="grade-cell grade-a">90%</td>
+                            </tr>
+                            <tr>
+                                <td>Week 2 Discussion</td>
+                                <td>Jan 31</td>
+                                <td>Jan 30</td>
+                                <td>23/25</td>
+                                <td class="grade-cell grade-a">92%</td>
+                            </tr>
+                            <tr>
+                                <td>Week 2 Assignment</td>
+                                <td>Jan 31</td>
+                                <td>Jan 29</td>
+                                <td>45/50</td>
+                                <td class="grade-cell grade-a">A</td>
+                            </tr>
+                            <tr>
+                                <td>Week 3 Discussion</td>
+                                <td>Feb 7</td>
+                                <td>—</td>
+                                <td>—/25</td>
+                                <td class="grade-cell grade-pending">Pending</td>
+                            </tr>
+                            <tr>
+                                <td>Week 3 Quiz</td>
+                                <td>Feb 7</td>
+                                <td>—</td>
+                                <td>—/20</td>
+                                <td class="grade-cell grade-pending">Pending</td>
+                            </tr>
+                            <tr>
+                                <td>Midterm Project</td>
+                                <td>Mar 7</td>
+                                <td>—</td>
+                                <td>—/100</td>
+                                <td class="grade-cell grade-pending">Pending</td>
+                            </tr>
+                            <tr>
+                                <td>Final Project</td>
+                                <td>May 8</td>
+                                <td>—</td>
+                                <td>—/150</td>
+                                <td class="grade-cell grade-pending">Pending</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Syllabus Overlay -->
+    <div class="overlay" id="syllabusOverlay">
+        <div class="overlay-content" style="max-width: 1000px;">
+            <div class="overlay-header">
+                <h2>Course Syllabus - Web Systems II</h2>
+                <button class="overlay-close" onclick="closeOverlay('syllabus')">&times;</button>
+            </div>
+            <div class="overlay-body">
+                <div class="syllabus-content">
+                    <div class="syllabus-section">
+                        <h3>Course Information</h3>
+                        <table class="syllabus-table">
+                            <tr><td><strong>Course Title:</strong></td><td>Web Systems II</td></tr>
+                            <tr><td><strong>Course Number:</strong></td><td>521F_SP26_ON</td></tr>
+                            <tr><td><strong>Credit Hours:</strong></td><td>3</td></tr>
+                            <tr><td><strong>Term:</strong></td><td>Spring 2026</td></tr>
+                            <tr><td><strong>Delivery Mode:</strong></td><td>Online</td></tr>
+                            <tr><td><strong>Institution:</strong></td><td>Daytona State College</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="syllabus-section">
+                        <h3>Instructor Information</h3>
+                        <table class="syllabus-table">
+                            <tr><td><strong>Instructor:</strong></td><td>Dr. Sarah Mitchell</td></tr>
+                            <tr><td><strong>Email:</strong></td><td>smitchell@daytonastate.edu</td></tr>
+                            <tr><td><strong>Office:</strong></td><td>Building A, Room 215</td></tr>
+                            <tr><td><strong>Office Hours:</strong></td><td>Monday & Wednesday 2:00 PM - 4:00 PM (Virtual)</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="syllabus-section">
+                        <h3>Course Description</h3>
+                        <p>This course provides advanced instruction in web development technologies, including server-side programming, database integration, API development, and modern web frameworks. Students will build upon foundational web development skills to create dynamic, data-driven web applications.</p>
+                    </div>
+
+                    <div class="syllabus-section">
+                        <h3>Learning Objectives</h3>
+                        <p>Upon successful completion of this course, students will be able to:</p>
+                        <ul>
+                            <li>Design and implement server-side web applications using modern frameworks</li>
+                            <li>Integrate databases with web applications for data persistence</li>
+                            <li>Develop and consume RESTful APIs</li>
+                            <li>Apply security best practices in web development</li>
+                            <li>Deploy web applications to cloud platforms</li>
+                            <li>Utilize version control systems for collaborative development</li>
+                        </ul>
+                    </div>
+
+                    <div class="syllabus-section">
+                        <h3>Required Materials</h3>
+                        <ul>
+                            <li>Textbook: "Modern Web Development" (3rd Edition) - Available through course reserves</li>
+                            <li>Access to a computer with internet connection</li>
+                            <li>GitHub account (free)</li>
+                            <li>Code editor (VS Code recommended - free)</li>
+                        </ul>
+                    </div>
+
+                    <div class="syllabus-section">
+                        <h3>Grading Policy</h3>
+                        <table class="syllabus-table grading-table">
+                            <tr><td>Weekly Discussions</td><td>15%</td></tr>
+                            <tr><td>Weekly Quizzes</td><td>15%</td></tr>
+                            <tr><td>Assignments</td><td>25%</td></tr>
+                            <tr><td>Midterm Project</td><td>20%</td></tr>
+                            <tr><td>Final Project</td><td>25%</td></tr>
+                            <tr class="total-row"><td><strong>Total</strong></td><td><strong>100%</strong></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="syllabus-section">
+                        <h3>Grade Scale</h3>
+                        <table class="syllabus-table grade-scale">
+                            <tr><td>A</td><td>90 - 100%</td></tr>
+                            <tr><td>B</td><td>80 - 89%</td></tr>
+                            <tr><td>C</td><td>70 - 79%</td></tr>
+                            <tr><td>D</td><td>60 - 69%</td></tr>
+                            <tr><td>F</td><td>Below 60%</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="syllabus-section">
+                        <h3>Course Policies</h3>
+                        <p><strong>Late Work:</strong> Assignments submitted after the deadline will receive a 10% deduction per day, up to 3 days. After 3 days, late work will not be accepted without prior arrangement.</p>
+                        <p><strong>Academic Integrity:</strong> Students are expected to complete their own work. Plagiarism or cheating will result in a zero for the assignment and may result in further disciplinary action.</p>
+                        <p><strong>Participation:</strong> Active participation in weekly discussions is required. Students should log in at least 3 times per week.</p>
+                    </div>
+
+                    <div class="syllabus-section">
+                        <h3>Important Dates</h3>
+                        <table class="syllabus-table">
+                            <tr><td>Course Start:</td><td>January 18, 2026</td></tr>
+                            <tr><td>Midterm Project Due:</td><td>March 7, 2026</td></tr>
+                            <tr><td>Spring Break:</td><td>March 15-21, 2026</td></tr>
+                            <tr><td>Last Day to Withdraw:</td><td>April 1, 2026</td></tr>
+                            <tr><td>Final Project Due:</td><td>May 8, 2026</td></tr>
+                            <tr><td>Course End:</td><td>May 8, 2026</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Course data structure - Extended weeks through May 8
+        const courseData = {
+            weeks: [
+                { id: 1, title: 'Week 1', dates: 'Jan 18-24', isCurrent: false },
+                { id: 2, title: 'Week 2', dates: 'Jan 25-31', isCurrent: true },
+                { id: 3, title: 'Week 3', dates: 'Feb 1-7', isCurrent: false },
+                { id: 4, title: 'Week 4', dates: 'Feb 8-14', isCurrent: false },
+                { id: 5, title: 'Week 5', dates: 'Feb 15-21', isCurrent: false },
+                { id: 6, title: 'Week 6', dates: 'Feb 22-28', isCurrent: false },
+                { id: 7, title: 'Week 7', dates: 'Mar 1-7', isCurrent: false },
+                { id: 8, title: 'Week 8', dates: 'Mar 8-14', isCurrent: false },
+                { id: 9, title: 'Week 9', dates: 'Mar 15-21', isCurrent: false },
+                { id: 10, title: 'Week 10', dates: 'Mar 22-28', isCurrent: false },
+                { id: 11, title: 'Week 11', dates: 'Mar 29-Apr 4', isCurrent: false },
+                { id: 12, title: 'Week 12', dates: 'Apr 5-11', isCurrent: false },
+                { id: 13, title: 'Week 13', dates: 'Apr 12-18', isCurrent: false },
+                { id: 14, title: 'Week 14', dates: 'Apr 19-25', isCurrent: false },
+                { id: 15, title: 'Week 15', dates: 'Apr 26-May 2', isCurrent: false },
+                { id: 16, title: 'Week 16', dates: 'May 3-8', isCurrent: false },
+            ],
+            subItems: [
+                { id: 'content', title: 'Class Content', icon: 'content' },
+                { id: 'discussions', title: 'Discussions', icon: 'discussions' },
+                { id: 'assignments', title: 'Assignments', icon: 'assignments' },
+                { id: 'quizzes', title: 'Quizzes', icon: 'quizzes' }
+            ]
+        };
+
+        // Sample content for demonstration
+        const sampleContent = {
+            content: {
+                title: 'Class Content',
+                items: [
+                    { title: 'Lecture Video: Introduction to Management Principles', desc: 'Core concepts and frameworks for effective supervision', duration: '45 min', type: 'Video' },
+                    { title: 'Reading: Leadership Styles Overview', desc: 'Chapter 3 from the course textbook', duration: '20 min', type: 'Reading' },
+                    { title: 'Supplementary Materials', desc: 'Additional resources and case studies', duration: '15 min', type: 'PDF' }
+                ]
+            },
+            discussions: {
+                title: 'Discussions',
+                items: [
+                    { title: 'Discussion Forum: Leadership Challenges', desc: 'Share your experiences with leadership challenges in the workplace', duration: 'Due: Friday', type: '12 posts' },
+                    { title: 'Peer Review Thread', desc: 'Review and provide feedback on classmate submissions', duration: 'Due: Sunday', type: '3 reviews' }
+                ]
+            },
+            assignments: {
+                title: 'Assignments',
+                items: [
+                    { title: 'Case Study Analysis', desc: 'Analyze the provided business scenario and propose solutions', duration: 'Due: Saturday', type: '500 words' },
+                    { title: 'Reflection Journal', desc: 'Weekly reflection on learning objectives', duration: 'Due: Sunday', type: '300 words' }
+                ]
+            },
+            quizzes: {
+                title: 'Quizzes',
+                items: [
+                    { title: 'Module Quiz', desc: 'Test your understanding of this week\'s material', duration: '20 min', type: '15 questions' }
+                ]
+            }
+        };
+
+        // Icons SVG
+        const icons = {
+            chevron: '<svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>',
+            content: '<svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM9.5 12l-3.5 4.5v-9l3.5 4.5zm2 0l4.5 4.5v-9l-4.5 4.5z"/></svg>',
+            discussions: '<svg viewBox="0 0 24 24"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg>',
+            assignments: '<svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>',
+            quizzes: '<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>',
+            star: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>',
+            clock: '<svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>',
+            type: '<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>',
+            folder: '<svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>'
+        };
+
+        let currentSelection = { week: null, item: null };
+
+        // Overlay functions
+        function openOverlay(type) {
+            document.getElementById(type + 'Overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeOverlay(type) {
+            document.getElementById(type + 'Overlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close overlay on background click
+        document.querySelectorAll('.overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        // Initialize the menu
+        function initMenu() {
+            const menuContainer = document.getElementById('weekMenu');
+            
+            courseData.weeks.forEach(week => {
+                const weekElement = document.createElement('div');
+                weekElement.className = 'week-item';
+                weekElement.innerHTML = `
+                    <div class="week-header" data-week="${week.id}">
+                        <div class="week-toggle">${icons.chevron}</div>
+                        <span class="week-title">${week.title}</span>
+                        <span class="week-dates">${week.dates}</span>
+                        ${week.isCurrent ? `<span class="current-week-badge">${icons.star} Current</span>` : ''}
+                    </div>
+                    <div class="week-subitems" id="subitems-${week.id}">
+                        ${courseData.subItems.map(sub => `
+                            <div class="sub-item" data-week="${week.id}" data-item="${sub.id}">
+                                <div class="sub-item-icon ${sub.icon}">${icons[sub.icon]}</div>
+                                <span class="sub-item-text">${sub.title}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                menuContainer.appendChild(weekElement);
+
+                // Auto-expand current week
+                if (week.isCurrent) {
+                    setTimeout(() => {
+                        const header = weekElement.querySelector('.week-header');
+                        header.classList.add('expanded');
+                        document.getElementById(`subitems-${week.id}`).classList.add('expanded');
+                    }, 100);
+                }
+            });
+
+            // Add event listeners
+            document.querySelectorAll('.week-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const weekId = this.dataset.week;
+                    toggleWeek(weekId);
+                });
+            });
+
+            document.querySelectorAll('.sub-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const weekId = this.dataset.week;
+                    const itemId = this.dataset.item;
+                    selectItem(weekId, itemId);
+                });
+            });
+
+            // Show welcome content initially
+            showWelcomeContent();
+            updateProgress();
+        }
+
+        function toggleWeek(weekId) {
+            const header = document.querySelector(`.week-header[data-week="${weekId}"]`);
+            const subitems = document.getElementById(`subitems-${weekId}`);
+            
+            header.classList.toggle('expanded');
+            subitems.classList.toggle('expanded');
+        }
+
+        function selectItem(weekId, itemId) {
+            // Remove previous active state
+            document.querySelectorAll('.sub-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Set new active state
+            const selectedItem = document.querySelector(`.sub-item[data-week="${weekId}"][data-item="${itemId}"]`);
+            selectedItem.classList.add('active');
+
+            currentSelection = { week: weekId, item: itemId };
+            loadContent(weekId, itemId);
+        }
+
+        function loadContent(weekId, itemId) {
+            const week = courseData.weeks.find(w => w.id == weekId);
+            const content = sampleContent[itemId];
+            const contentArea = document.getElementById('contentArea');
+
+            contentArea.innerHTML = `
+                <div class="content-breadcrumb">
+                    ${week.title} (${week.dates}) / <span>${content.title}</span>
+                </div>
+                <h1 class="content-title">${content.title}</h1>
+                <p class="content-subtitle">${week.title} • ${week.dates}</p>
+                
+                <div class="content-section">
+                    <h3>${icons.folder} Materials</h3>
+                    ${content.items.map(item => `
+                        <div class="content-card">
+                            <h4>${item.title}</h4>
+                            <p>${item.desc}</p>
+                            <div class="meta">
+                                <span>${icons.clock} ${item.duration}</span>
+                                <span>${icons.type} ${item.type}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function showWelcomeContent() {
+            const contentArea = document.getElementById('contentArea');
+            const currentWeek = courseData.weeks.find(w => w.isCurrent);
+            
+            contentArea.innerHTML = `
+                <div class="content-breadcrumb">
+                    Welcome
+                </div>
+                <h1 class="content-title">Welcome to Web Systems II</h1>
+                <p class="content-subtitle">521F_SP26_ON • Spring 2026</p>
+                
+                <div class="content-section">
+                    <h3>📍 Current Week: ${currentWeek.title} (${currentWeek.dates})</h3>
+                    <div class="content-card">
+                        <h4>Getting Started</h4>
+                        <p>Select a topic from the left menu to view course materials, discussions, assignments, and quizzes. The current week is highlighted with a badge for easy navigation.</p>
+                    </div>
+                    <div class="content-card">
+                        <h4>Course Progress</h4>
+                        <p>You are currently in Week ${currentWeek.id} of ${courseData.weeks.length}. Keep up the great work and stay on track with your assignments and discussions.</p>
+                        <div class="meta">
+                            <span>${icons.clock} ${courseData.weeks.length} weeks total</span>
+                            <span>${icons.type} ${courseData.subItems.length} sections per week</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateProgress() {
+            const currentWeek = courseData.weeks.find(w => w.isCurrent);
+            const progress = (currentWeek.id / courseData.weeks.length) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initMenu);
+    </script>
+</body>
+</html>
