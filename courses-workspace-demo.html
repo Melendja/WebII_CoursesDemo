@@ -397,6 +397,25 @@
             font-weight: 600;
         }
 
+        .content-breadcrumb .home-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            margin-right: 0.25rem;
+        }
+
+        .content-breadcrumb .home-icon:hover {
+            color: var(--primary-blue);
+        }
+
+        .content-breadcrumb .home-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
         .content-title {
             font-family: 'Playfair Display', Georgia, serif;
             font-size: 2rem;
@@ -473,6 +492,83 @@
             width: 14px;
             height: 14px;
             fill: var(--text-muted);
+        }
+
+        /* Notice and Due Dates Styles */
+        .notice-placeholder {
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .placeholder-note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed var(--border-light);
+        }
+
+        .due-dates-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+        }
+
+        .due-date-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: var(--white);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .due-date-calendar {
+            width: 50px;
+            height: 55px;
+            background: var(--primary-blue);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            flex-shrink: 0;
+        }
+
+        .due-month {
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+        }
+
+        .due-day {
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .due-date-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .due-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .due-type {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* Overlay Modal */
@@ -671,6 +767,140 @@
         .grade-b { color: #2b6cb0; }
         .grade-c { color: #c05621; }
         .grade-pending { color: var(--text-muted); font-style: italic; }
+
+        /* Communications Overlay Styles */
+        .communications-overlay {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .communications-overlay .overlay-header {
+            background: var(--primary-blue);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .ms365-section {
+            background: var(--bg-cream);
+        }
+
+        /* Unified section title bar styling */
+        .section-title-bar {
+            padding: 0.75rem 1.5rem;
+            background: var(--white);
+            border-top: 1px solid #c9c6c0;
+            border-bottom: 1px solid #c9c6c0;
+        }
+
+        .section-title-bar h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .comm-tools-bar {
+            padding: 1.5rem 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            gap: 3rem;
+            background: var(--bg-cream);
+        }
+
+        .comm-tool {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            gap: 0.5rem;
+        }
+
+        .tool-label {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .outlook-tool:hover .tool-label {
+            color: #0078D4;
+        }
+
+        .outlook-icon-wrapper {
+            position: relative;
+            width: 118px;
+            height: 50px;
+        }
+
+        .outlook-logo {
+            width: 118px;
+            height: 50px;
+        }
+
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #D83B01;
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 600;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px;
+        }
+
+        .teams-icon-wrapper {
+            width: 118px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .teams-logo {
+            width: 85px;
+            height: 42px;
+        }
+
+        .teams-tool:hover .tool-label {
+            color: #5059C9;
+        }
+
+        .contact-section {
+            background: var(--bg-cream);
+        }
+
+        .communications-overlay .overlay-body {
+            padding: 1.5rem;
+            max-height: calc(85vh - 280px);
+            background: var(--bg-cream);
+        }
+
+        /* Email icon link for students */
+        .email-icon-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+
+        .email-icon-link svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--primary-blue);
+            transition: fill 0.2s ease;
+        }
+
+        .email-icon-link:hover svg {
+            fill: var(--accent-gold);
+        }
 
         /* Syllabus Styles */
         .syllabus-content {
@@ -1145,7 +1375,7 @@
 
         <!-- Top Menu Bar -->
         <nav class="top-menu-bar">
-            <div class="top-menu-item" onclick="openOverlay('contacts')">Contact Information</div>
+            <div class="top-menu-item" onclick="openOverlay('contacts')">Communications</div>
             <div class="top-menu-item" onclick="openOverlay('syllabus')">Syllabus</div>
             <div class="top-menu-item has-dropdown">
                 <span class="menu-text">Grades</span>
@@ -1209,124 +1439,190 @@
 
     <!-- Contact Information Overlay -->
     <div class="overlay" id="contactsOverlay">
-        <div class="overlay-content">
+        <div class="overlay-content communications-overlay">
+            <!-- Communications Header -->
             <div class="overlay-header">
-                <h2>Contact Information</h2>
+                <h2>Communications</h2>
                 <button class="overlay-close" onclick="closeOverlay('contacts')">&times;</button>
             </div>
-            <div class="overlay-body">
-                <div class="contacts-grid">
-                    <!-- Instructor Card -->
-                    <div class="contact-card instructor">
-                        <div class="contact-avatar instructor-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+
+            <!-- Microsoft 365 Section -->
+            <div class="ms365-section">
+                <div class="section-title-bar">
+                    <h3>Microsoft 365</h3>
+                </div>
+                <div class="comm-tools-bar">
+                    <a href="https://outlook.office365.com/mail/?realm=daytonastate.edu" target="_blank" class="comm-tool outlook-tool">
+                        <div class="outlook-icon-wrapper">
+                            <svg viewBox="0 0 100 100" class="outlook-logo">
+                                <!-- Blue background rectangle -->
+                                <rect x="5" y="15" width="50" height="70" rx="4" fill="#0078D4"/>
+                                <!-- White O letter -->
+                                <ellipse cx="30" cy="50" rx="15" ry="18" fill="none" stroke="white" stroke-width="5"/>
+                                <!-- Envelope -->
+                                <g transform="translate(40, 25)">
+                                    <rect x="0" y="8" width="50" height="35" rx="3" fill="#0078D4" stroke="white" stroke-width="2"/>
+                                    <path d="M0 11 L25 30 L50 11" fill="none" stroke="white" stroke-width="2"/>
+                                </g>
+                            </svg>
+                            <span class="unread-badge">1</span>
                         </div>
-                        <div class="contact-info">
-                            <p class="role">Instructor</p>
-                            <h4>Dr. Sarah Mitchell</h4>
-                            <p>smitchell@daytonastate.edu</p>
-                            <p>Office: Building A, Room 215</p>
+                        <span class="tool-label">Outlook</span>
+                    </a>
+                    <div class="comm-tool teams-tool">
+                        <div class="teams-icon-wrapper">
+                            <svg viewBox="0 0 48 48" class="teams-logo">
+                                <path fill="#5059C9" d="M42 16h-10c-1.1 0-2 .9-2 2v14c0 2.2 1.8 4 4 4h6c2.2 0 4-1.8 4-4V18c0-1.1-.9-2-2-2z"/>
+                                <circle fill="#5059C9" cx="40" cy="10" r="4"/>
+                                <path fill="#7B83EB" d="M32 16H16c-1.1 0-2 .9-2 2v16c0 3.3 2.7 6 6 6h8c3.3 0 6-2.7 6-6V18c0-1.1-.9-2-2-2z"/>
+                                <circle fill="#7B83EB" cx="24" cy="10" r="6"/>
+                            </svg>
                         </div>
+                        <span class="tool-label">Teams</span>
                     </div>
-                    <!-- Student Cards -->
-                    <div class="contact-card">
-                        <div class="contact-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+            </div>
+
+            <!-- Contact Information Section -->
+            <div class="contact-section">
+                <div class="section-title-bar">
+                    <h3>Contact Information</h3>
+                </div>
+                <div class="overlay-body">
+                    <div class="contacts-grid">
+                        <!-- Instructor Card -->
+                        <div class="contact-card instructor">
+                            <div class="contact-avatar instructor-avatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="contact-info">
+                                <p class="role">Instructor</p>
+                                <h4>Dr. Sarah Mitchell</h4>
+                                <p>smitchell@daytonastate.edu</p>
+                                <p>Office: Building A, Room 215</p>
+                                <p>Office Hours: Mon & Wed 2:00 PM - 4:00 PM</p>
+                            </div>
                         </div>
-                        <div class="contact-info">
-                            <p class="role">Student</p>
-                            <h4>James Anderson</h4>
-                            <p>janderson@students.daytonastate.edu</p>
+                        <!-- Student Cards -->
+                        <div class="contact-card">
+                            <div class="contact-avatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="contact-info">
+                                <p class="role">Student</p>
+                                <h4>James Anderson</h4>
+                                <a href="https://outlook.office365.com/mail/deeplink/compose?to=janderson@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email James Anderson">
+                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <div class="contact-card">
+                            <div class="contact-avatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="contact-info">
+                                <p class="role">Student</p>
+                                <h4>Maria Rodriguez</h4>
+                                <a href="https://outlook.office365.com/mail/deeplink/compose?to=mrodriguez@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Maria Rodriguez">
+                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                </a>
+                            </div>
                         </div>
-                        <div class="contact-info">
-                            <p class="role">Student</p>
-                            <h4>Maria Rodriguez</h4>
-                            <p>mrodriguez@students.daytonastate.edu</p>
+                        <div class="contact-card">
+                            <div class="contact-avatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="contact-info">
+                                <p class="role">Student</p>
+                                <h4>David Chen</h4>
+                                <a href="https://outlook.office365.com/mail/deeplink/compose?to=dchen@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email David Chen">
+                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <div class="contact-card">
+                            <div class="contact-avatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="contact-info">
+                                <p class="role">Student</p>
+                                <h4>Emily Thompson</h4>
+                                <a href="https://outlook.office365.com/mail/deeplink/compose?to=ethompson@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Emily Thompson">
+                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                </a>
+                            </div>
                         </div>
-                        <div class="contact-info">
-                            <p class="role">Student</p>
-                            <h4>David Chen</h4>
-                            <p>dchen@students.daytonastate.edu</p>
+                        <div class="contact-card">
+                            <div class="contact-avatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="contact-info">
+                                <p class="role">Student</p>
+                                <h4>Michael Williams</h4>
+                                <a href="https://outlook.office365.com/mail/deeplink/compose?to=mwilliams@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Michael Williams">
+                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <div class="contact-card">
+                            <div class="contact-avatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="contact-info">
+                                <p class="role">Student</p>
+                                <h4>Jessica Martinez</h4>
+                                <a href="https://outlook.office365.com/mail/deeplink/compose?to=jmartinez@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Jessica Martinez">
+                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                </a>
+                            </div>
                         </div>
-                        <div class="contact-info">
-                            <p class="role">Student</p>
-                            <h4>Emily Thompson</h4>
-                            <p>ethompson@students.daytonastate.edu</p>
+                        <div class="contact-card">
+                            <div class="contact-avatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="contact-info">
+                                <p class="role">Student</p>
+                                <h4>Christopher Brown</h4>
+                                <a href="https://outlook.office365.com/mail/deeplink/compose?to=cbrown@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Christopher Brown">
+                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <div class="contact-card">
+                            <div class="contact-avatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="contact-info">
+                                <p class="role">Student</p>
+                                <h4>Ashley Davis</h4>
+                                <a href="https://outlook.office365.com/mail/deeplink/compose?to=adavis@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Ashley Davis">
+                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                </a>
+                            </div>
                         </div>
-                        <div class="contact-info">
-                            <p class="role">Student</p>
-                            <h4>Michael Williams</h4>
-                            <p>mwilliams@students.daytonastate.edu</p>
+                        <div class="contact-card">
+                            <div class="contact-avatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="contact-info">
+                                <p class="role">Student</p>
+                                <h4>Daniel Johnson</h4>
+                                <a href="https://outlook.office365.com/mail/deeplink/compose?to=djohnson@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Daniel Johnson">
+                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        </div>
-                        <div class="contact-info">
-                            <p class="role">Student</p>
-                            <h4>Jessica Martinez</h4>
-                            <p>jmartinez@students.daytonastate.edu</p>
-                        </div>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        </div>
-                        <div class="contact-info">
-                            <p class="role">Student</p>
-                            <h4>Christopher Brown</h4>
-                            <p>cbrown@students.daytonastate.edu</p>
-                        </div>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        </div>
-                        <div class="contact-info">
-                            <p class="role">Student</p>
-                            <h4>Ashley Davis</h4>
-                            <p>adavis@students.daytonastate.edu</p>
-                        </div>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        </div>
-                        <div class="contact-info">
-                            <p class="role">Student</p>
-                            <h4>Daniel Johnson</h4>
-                            <p>djohnson@students.daytonastate.edu</p>
-                        </div>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        </div>
-                        <div class="contact-info">
-                            <p class="role">Student</p>
-                            <h4>Sarah Wilson</h4>
-                            <p>swilson@students.daytonastate.edu</p>
+                        <div class="contact-card">
+                            <div class="contact-avatar">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="contact-info">
+                                <p class="role">Student</p>
+                                <h4>Sarah Wilson</h4>
+                                <a href="https://outlook.office365.com/mail/deeplink/compose?to=swilson@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Sarah Wilson">
+                                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1736,6 +2032,9 @@
                 // Special discussion layout
                 contentArea.innerHTML = `
                     <div class="content-breadcrumb">
+                        <a href="#" class="home-icon" onclick="showWelcomeContent(); return false;" title="Home">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        </a>
                         ${week.title} (${week.dates}) / <span>${content.title}</span>
                     </div>
                     <div class="discussion-layout">
@@ -1839,6 +2138,9 @@
                 // Standard content layout
                 contentArea.innerHTML = `
                     <div class="content-breadcrumb">
+                        <a href="#" class="home-icon" onclick="showWelcomeContent(); return false;" title="Home">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        </a>
                         ${week.title} (${week.dates}) / <span>${content.title}</span>
                     </div>
                     <h1 class="content-title">${content.title}</h1>
@@ -1874,8 +2176,19 @@
             const contentArea = document.getElementById('contentArea');
             const currentWeek = courseData.weeks.find(w => w.isCurrent);
             
+            // Remove active state from any selected items
+            document.querySelectorAll('.sub-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Remove full-width class if present
+            contentArea.classList.remove('full-width');
+            
             contentArea.innerHTML = `
                 <div class="content-breadcrumb">
+                    <a href="#" class="home-icon" onclick="showWelcomeContent(); return false;" title="Home">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    </a>
                     Welcome
                 </div>
                 <h1 class="content-title">Welcome to Web Systems II</h1>
@@ -1884,16 +2197,45 @@
                 <div class="content-section">
                     <h3>📍 Current Week: ${currentWeek.title} (${currentWeek.dates})</h3>
                     <div class="content-card">
-                        <h4>Getting Started</h4>
-                        <p>Select a topic from the left menu to view course materials, discussions, assignments, and quizzes. The current week is highlighted with a badge for easy navigation.</p>
+                        <h4>Notice(s):</h4>
+                        <p class="notice-placeholder">No notices at this time.</p>
+                        <p class="placeholder-note"><em>This section will be populated from the course announcements feed.</em></p>
                     </div>
                     <div class="content-card">
-                        <h4>Course Progress</h4>
-                        <p>You are currently in Week ${currentWeek.id} of ${courseData.weeks.length}. Keep up the great work and stay on track with your assignments and discussions.</p>
-                        <div class="meta">
-                            <span>${icons.clock} ${courseData.weeks.length} weeks total</span>
-                            <span>${icons.type} ${courseData.subItems.length} sections per week</span>
+                        <h4>Next Due Dates:</h4>
+                        <div class="due-dates-list">
+                            <div class="due-date-item">
+                                <div class="due-date-calendar">
+                                    <span class="due-month">JAN</span>
+                                    <span class="due-day">31</span>
+                                </div>
+                                <div class="due-date-info">
+                                    <span class="due-title">Week 2 Discussion Post</span>
+                                    <span class="due-type">Discussion</span>
+                                </div>
+                            </div>
+                            <div class="due-date-item">
+                                <div class="due-date-calendar">
+                                    <span class="due-month">JAN</span>
+                                    <span class="due-day">31</span>
+                                </div>
+                                <div class="due-date-info">
+                                    <span class="due-title">Week 2 Quiz</span>
+                                    <span class="due-type">Quiz</span>
+                                </div>
+                            </div>
+                            <div class="due-date-item">
+                                <div class="due-date-calendar">
+                                    <span class="due-month">FEB</span>
+                                    <span class="due-day">7</span>
+                                </div>
+                                <div class="due-date-info">
+                                    <span class="due-title">Week 3 Assignment</span>
+                                    <span class="due-type">Assignment</span>
+                                </div>
+                            </div>
                         </div>
+                        <p class="placeholder-note"><em>This section will be populated from the course calendar feed.</em></p>
                     </div>
                 </div>
             `;
