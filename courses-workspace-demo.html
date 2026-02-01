@@ -361,6 +361,19 @@
         .sub-item-icon.quizzes { background: #faf5ff; }
         .sub-item-icon.quizzes svg { fill: #6b46c1; }
 
+        .sub-item-icon.projects { background: #e6f7f7; }
+        .sub-item-icon.projects svg { fill: #0d9488; }
+
+        .sub-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .sub-item.disabled:hover {
+            background: transparent;
+            border-left-color: transparent;
+        }
+
         .sub-item-text {
             font-size: 0.85rem;
             color: var(--text-dark);
@@ -569,6 +582,21 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        .due-date-item.project-due .due-date-calendar.project {
+            background: #0d9488;
+        }
+
+        .due-date-item.project-due .due-type {
+            color: #0d9488;
+            font-weight: 600;
+        }
+
+        .due-date-item.project-due .project-start {
+            color: var(--text-muted);
+            font-weight: 400;
+            text-transform: none;
         }
 
         /* Overlay Modal */
@@ -997,6 +1025,162 @@
             width: 100%;
         }
 
+        /* Project Layout Styles */
+        .project-layout {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .project-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .project-team-panel {
+            width: 280px;
+            flex-shrink: 0;
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            overflow: hidden;
+            height: fit-content;
+            position: sticky;
+            top: 1rem;
+        }
+
+        .team-header {
+            padding: 1rem 1.25rem;
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .team-header h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .team-members {
+            padding: 1rem;
+        }
+
+        .team-member {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .team-member:hover {
+            background: var(--bg-cream);
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .member-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .member-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .member-role {
+            font-size: 0.75rem;
+            color: var(--accent-gold);
+            font-weight: 500;
+        }
+
+        /* Milestone Timeline */
+        .milestones-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .milestone-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-left: 3px solid var(--border-light);
+            position: relative;
+            background: var(--white);
+            margin-left: 1rem;
+        }
+
+        .milestone-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 1.25rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--border-light);
+            border: 2px solid var(--white);
+        }
+
+        .milestone-item.current {
+            border-left-color: var(--primary-blue);
+            background: var(--bg-cream);
+        }
+
+        .milestone-item.current::before {
+            background: var(--primary-blue);
+        }
+
+        .milestone-item.completed {
+            border-left-color: #10b981;
+        }
+
+        .milestone-item.completed::before {
+            background: #10b981;
+        }
+
+        .milestone-week {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            min-width: 60px;
+        }
+
+        .milestone-content h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .milestone-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .milestone-card {
+            border-left: 4px solid var(--primary-blue);
+        }
+
         .discussion-main {
             flex: 1;
             min-width: 0;
@@ -1343,6 +1527,13 @@
             .discussion-threads {
                 width: 100%;
                 max-height: 500px;
+            }
+            .project-layout {
+                flex-direction: column;
+            }
+            .project-team-panel {
+                width: 100%;
+                position: static;
             }
         }
 
@@ -1843,9 +2034,68 @@
                 { id: 'content', title: 'Class Content', icon: 'content' },
                 { id: 'discussions', title: 'Discussions', icon: 'discussions' },
                 { id: 'assignments', title: 'Assignments', icon: 'assignments' },
-                { id: 'quizzes', title: 'Quizzes', icon: 'quizzes' }
-            ]
+                { id: 'quizzes', title: 'Quizzes', icon: 'quizzes' },
+                { id: 'projects', title: 'Project(s)', icon: 'projects' }
+            ],
+            projects: {
+                project1: {
+                    name: 'Project 1: Web Application Development',
+                    startWeek: 4,
+                    endWeek: 7,
+                    dueDate: 'Mar 7',
+                    dueDateFull: 'March 7, 2026',
+                    description: 'Design and develop a responsive web application using modern frameworks and best practices.',
+                    members: [
+                        { name: 'James Anderson', role: 'Project Lead' },
+                        { name: 'Maria Rodriguez', role: 'Frontend Developer' },
+                        { name: 'David Chen', role: 'Backend Developer' },
+                        { name: 'Emily Thompson', role: 'UI/UX Designer' }
+                    ],
+                    milestones: [
+                        { week: 4, title: 'Project Planning & Requirements', desc: 'Define project scope, requirements, and initial wireframes' },
+                        { week: 5, title: 'Design & Architecture', desc: 'Create detailed designs and system architecture' },
+                        { week: 6, title: 'Development Phase', desc: 'Implement core features and functionality' },
+                        { week: 7, title: 'Testing & Final Submission', desc: 'Complete testing, documentation, and final presentation' }
+                    ]
+                },
+                project2: {
+                    name: 'Project 2: API Integration & Database',
+                    startWeek: 10,
+                    endWeek: 16,
+                    dueDate: 'May 8',
+                    dueDateFull: 'May 8, 2026',
+                    description: 'Build a full-stack application with RESTful API integration and database management.',
+                    members: [
+                        { name: 'Michael Williams', role: 'Project Lead' },
+                        { name: 'Jessica Martinez', role: 'API Developer' },
+                        { name: 'Christopher Brown', role: 'Database Admin' },
+                        { name: 'Ashley Davis', role: 'Full Stack Developer' },
+                        { name: 'Daniel Johnson', role: 'QA Engineer' }
+                    ],
+                    milestones: [
+                        { week: 10, title: 'Project Kickoff & Planning', desc: 'Team formation, project planning, and technology selection' },
+                        { week: 11, title: 'Database Design', desc: 'Design database schema and set up development environment' },
+                        { week: 12, title: 'API Development', desc: 'Develop RESTful API endpoints' },
+                        { week: 13, title: 'Frontend Integration', desc: 'Connect frontend to API and implement features' },
+                        { week: 14, title: 'Testing & Optimization', desc: 'Comprehensive testing and performance optimization' },
+                        { week: 15, title: 'Documentation', desc: 'Complete technical documentation and user guides' },
+                        { week: 16, title: 'Final Presentation', desc: 'Project demonstration and final submission' }
+                    ]
+                }
+            }
         };
+
+        // Helper function to check if a week has an active project
+        function getActiveProject(weekId) {
+            const projects = courseData.projects;
+            for (const key in projects) {
+                const project = projects[key];
+                if (weekId >= project.startWeek && weekId <= project.endWeek) {
+                    return { ...project, key: key };
+                }
+            }
+            return null;
+        }
 
         // Sample content for demonstration
         const sampleContent = {
@@ -1912,6 +2162,7 @@
             discussions: '<svg viewBox="0 0 24 24"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg>',
             assignments: '<svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>',
             quizzes: '<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>',
+            projects: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>',
             star: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>',
             clock: '<svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>',
             type: '<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>',
@@ -1948,6 +2199,9 @@
             courseData.weeks.forEach(week => {
                 const weekElement = document.createElement('div');
                 weekElement.className = 'week-item';
+                
+                const activeProject = getActiveProject(week.id);
+                
                 weekElement.innerHTML = `
                     <div class="week-header" data-week="${week.id}">
                         <div class="week-toggle">${icons.chevron}</div>
@@ -1956,12 +2210,14 @@
                         ${week.isCurrent ? `<span class="current-week-badge">${icons.star} Current</span>` : ''}
                     </div>
                     <div class="week-subitems" id="subitems-${week.id}">
-                        ${courseData.subItems.map(sub => `
-                            <div class="sub-item" data-week="${week.id}" data-item="${sub.id}">
+                        ${courseData.subItems.map(sub => {
+                            const isProjectDisabled = sub.id === 'projects' && !activeProject;
+                            return `
+                            <div class="sub-item ${isProjectDisabled ? 'disabled' : ''}" data-week="${week.id}" data-item="${sub.id}" ${isProjectDisabled ? 'data-disabled="true"' : ''}>
                                 <div class="sub-item-icon ${sub.icon}">${icons[sub.icon]}</div>
                                 <span class="sub-item-text">${sub.title}</span>
                             </div>
-                        `).join('')}
+                        `}).join('')}
                     </div>
                 `;
                 menuContainer.appendChild(weekElement);
@@ -1987,6 +2243,9 @@
             document.querySelectorAll('.sub-item').forEach(item => {
                 item.addEventListener('click', function(e) {
                     e.stopPropagation();
+                    if (this.dataset.disabled === 'true') {
+                        return; // Don't do anything for disabled items
+                    }
                     const weekId = this.dataset.week;
                     const itemId = this.dataset.item;
                     selectItem(weekId, itemId);
@@ -2024,6 +2283,80 @@
             const week = courseData.weeks.find(w => w.id == weekId);
             const content = sampleContent[itemId];
             const contentArea = document.getElementById('contentArea');
+
+            // Handle projects separately
+            if (itemId === 'projects') {
+                const activeProject = getActiveProject(parseInt(weekId));
+                if (!activeProject) return;
+                
+                contentArea.classList.remove('full-width');
+                
+                const currentMilestone = activeProject.milestones.find(m => m.week == weekId);
+                
+                contentArea.innerHTML = `
+                    <div class="content-breadcrumb">
+                        <a href="#" class="home-icon" onclick="showWelcomeContent(); return false;" title="Home">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        </a>
+                        ${week.title} (${week.dates}) / <span>Project(s)</span>
+                    </div>
+                    <div class="project-layout">
+                        <div class="project-main">
+                            <h1 class="content-title">${activeProject.name}</h1>
+                            <p class="content-subtitle">${week.title} • Due: ${activeProject.dueDateFull}</p>
+                            
+                            <div class="content-section">
+                                <h3>📋 Project Overview</h3>
+                                <div class="content-card">
+                                    <p>${activeProject.description}</p>
+                                </div>
+                            </div>
+
+                            ${currentMilestone ? `
+                            <div class="content-section">
+                                <h3>🎯 This Week's Milestone</h3>
+                                <div class="content-card milestone-card">
+                                    <h4>${currentMilestone.title}</h4>
+                                    <p>${currentMilestone.desc}</p>
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            <div class="content-section">
+                                <h3>📅 Project Timeline</h3>
+                                <div class="milestones-timeline">
+                                    ${activeProject.milestones.map(m => `
+                                        <div class="milestone-item ${m.week == weekId ? 'current' : ''} ${m.week < weekId ? 'completed' : ''}">
+                                            <div class="milestone-week">Week ${m.week}</div>
+                                            <div class="milestone-content">
+                                                <h4>${m.title}</h4>
+                                                <p>${m.desc}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="project-team-panel">
+                            <div class="team-header">
+                                <h3>Project Team</h3>
+                            </div>
+                            <div class="team-members">
+                                ${activeProject.members.map(member => `
+                                    <div class="team-member">
+                                        <div class="member-avatar">${member.name.split(' ').map(n => n[0]).join('')}</div>
+                                        <div class="member-info">
+                                            <span class="member-name">${member.name}</span>
+                                            <span class="member-role">${member.role}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
 
             if (content.isDiscussion) {
                 // Add full-width class for discussion layout
@@ -2184,6 +2517,10 @@
             // Remove full-width class if present
             contentArea.classList.remove('full-width');
             
+            // Get active projects for due dates display
+            const project1 = courseData.projects.project1;
+            const project2 = courseData.projects.project2;
+            
             contentArea.innerHTML = `
                 <div class="content-breadcrumb">
                     <a href="#" class="home-icon" onclick="showWelcomeContent(); return false;" title="Home">
@@ -2232,6 +2569,26 @@
                                 <div class="due-date-info">
                                     <span class="due-title">Week 3 Assignment</span>
                                     <span class="due-type">Assignment</span>
+                                </div>
+                            </div>
+                            <div class="due-date-item project-due">
+                                <div class="due-date-calendar project">
+                                    <span class="due-month">MAR</span>
+                                    <span class="due-day">7</span>
+                                </div>
+                                <div class="due-date-info">
+                                    <span class="due-title">${project1.name}</span>
+                                    <span class="due-type">Project <span class="project-start">• Starts Feb 8</span></span>
+                                </div>
+                            </div>
+                            <div class="due-date-item project-due">
+                                <div class="due-date-calendar project">
+                                    <span class="due-month">MAY</span>
+                                    <span class="due-day">8</span>
+                                </div>
+                                <div class="due-date-info">
+                                    <span class="due-title">${project2.name}</span>
+                                    <span class="due-type">Project <span class="project-start">• Starts Mar 22</span></span>
                                 </div>
                             </div>
                         </div>
