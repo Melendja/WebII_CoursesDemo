@@ -173,6 +173,13 @@
             fill: var(--text-muted);
         }
 
+        /* Right-aligned dropdown (expands from right to left) */
+        .dropdown-menu.dropdown-right {
+            left: auto;
+            right: 0;
+            min-width: 220px;
+        }
+
         /* Progress indicator in header */
         .progress-bar {
             position: absolute;
@@ -1582,7 +1589,7 @@
             <div class="top-menu-item" onclick="openOverlay('syllabus')">Syllabus</div>
             <div class="top-menu-item has-dropdown">
                 <span class="menu-text">Grades</span>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu dropdown-right">
                     <a href="#" onclick="openOverlay('grades'); return false;">View My Grades</a>
                     <a href="#" onclick="openOverlay('grades'); return false;">Grade Summary</a>
                     <a href="#">Grade Scale</a>
@@ -1590,32 +1597,36 @@
             </div>
             <div class="top-menu-item has-dropdown">
                 <span class="menu-text">Tools</span>
-                <div class="dropdown-menu">
-                    <a href="#">Attendance</a>
-                    <a href="#">Awards</a>
-                    <a href="#">Calendar</a>
-                    <a href="#">Checklist</a>
-                    <a href="#">Class Progress</a>
-                    <a href="#">ePortfolio</a>
-                    <a href="#">FalconMail</a>
-                    <a href="#">FAQ</a>
-                    <a href="#">Groups</a>
-                    <a href="#">Handbook</a>
-                    <a href="#">Links</a>
-                    <a href="#">Rubrics</a>
-                    <a href="#">Self Assessments</a>
-                    <a href="#">Surveys</a>
-                    <a href="#">Video Assignment</a>
-                    <a href="#">Virtual Classroom</a>
+                <div class="dropdown-menu dropdown-right">
+                    <a href="https://class.daytonastate.edu/d2l/lms/attendance/view/attendance_list.d2l?ou=496391" target="_blank">Attendance</a>
+                    <a href="https://class.daytonastate.edu/d2l/awards/496391/#/myAwards" target="_blank">Awards</a>
+                    <a href="https://class.daytonastate.edu/d2l/le/calendar/496391" target="_blank">Calendar</a>
+                    <a href="https://class.daytonastate.edu/d2l/lms/checklist/viewchecklists.d2l?ou=496391" target="_blank">Checklist</a>
+                    <a href="https://class.daytonastate.edu/d2l/le/userprogress/339541/496391/Summary?searchString=&sortField=SortLastName&sortDirection=0" target="_blank">Class Progress</a>
+                    <a href="https://class.daytonastate.edu/d2l/ep/496391/dashboard/index" target="_blank">ePortfolio</a>
+                    <a href="https://outlook.office365.com/mail/?realm=falconmail.daytonastate.edu" target="_blank">FalconMail</a>
+                    <a href="https://class.daytonastate.edu/d2l/lms/faq/view_faq.d2l?ou=496391" target="_blank">FAQ</a>
+                    <a href="https://class.daytonastate.edu/d2l/lms/group/user_group_list.d2l?ou=496391" target="_blank">Groups</a>
+                    <a href="https://class.daytonastate.edu/d2l/common/dialogs/quickLink/quickLink.d2l?ou=496391&type=lti&rcode=DBC-3639328&srcou=34091&launchFramed=1&framedName=Honorlock" target="_blank">Honorlock</a>
+                    <a href="https://class.daytonastate.edu/d2l/lms/links/view_links.d2l?ou=496391" target="_blank">Links</a>
+                    <a href="https://class.daytonastate.edu/d2l/lp/rubrics/list.d2l?ou=496391" target="_blank">Rubrics</a>
+                    <a href="https://class.daytonastate.edu/d2l/lms/selfassess/user/selfassess_list.d2l?ou=496391" target="_blank">Self Assessments</a>
+                    <a href="https://class.daytonastate.edu/d2l/lms/survey/user/surveys_list.d2l?ou=496391" target="_blank">Surveys</a>
+                    <a href="https://class.daytonastate.edu/d2l/ext/rp/496391/lti/framedlaunch/6a42fbb8-d4b6-4529-837d-f94b34ab3671" target="_blank">Video Assignment</a>
+                    <a href="https://class.daytonastate.edu/d2l/ext/rp/496391/lti/framedlaunch/a2c08ce4-8e00-4a37-91af-1f64890061f9" target="_blank">Virtual Classroom</a>
                 </div>
             </div>
             <div class="top-menu-item has-dropdown">
                 <span class="menu-text">Help</span>
-                <div class="dropdown-menu">
-                    <a href="#">Student Support</a>
-                    <a href="#">Technical Help</a>
-                    <a href="#">Accessibility</a>
-                    <a href="#">FAQs</a>
+                <div class="dropdown-menu dropdown-right">
+                    <a href="https://library.daytonastate.edu/falcononline" target="_blank">Falcon Online InfoGuide</a>
+                    <a href="https://services.daytonastate.edu/TDClient/86/Portal/KB/ArticleDet?ID=13243" target="_blank">FalconMail Setup</a>
+                    <a href="https://library.daytonastate.edu/student-falcon-self-service" target="_blank">Falcon Self-Service Portal</a>
+                    <a href="https://www.daytonastate.edu/library-and-tutoring/academic-support-center/index.html" target="_blank">Academic Support Center</a>
+                    <a href="https://library.daytonastate.edu/index" target="_blank">DSC Library</a>
+                    <a href="#">Counseling &amp; Accessibility Services</a>
+                    <a href="https://www.daytonastate.edu/library-and-tutoring/writing-center/" target="_blank">Writing Center</a>
+                    <a href="https://class.daytonastate.edu/d2l/systemCheck" target="_blank">System Check</a>
                 </div>
             </div>
         </nav>
