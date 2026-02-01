@@ -913,9 +913,7 @@
         .email-icon-link {
             display: flex;
             align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
+            gap: 0.4rem;
             flex-shrink: 0;
             text-decoration: none;
         }
@@ -929,6 +927,16 @@
 
         .email-icon-link:hover svg {
             fill: var(--accent-gold);
+        }
+
+        .email-icon-link .email-label {
+            font-size: 0.8rem;
+            color: var(--primary-blue);
+            transition: color 0.2s ease;
+        }
+
+        .email-icon-link:hover .email-label {
+            color: var(--accent-gold);
         }
 
         /* Syllabus Styles */
@@ -1708,6 +1716,7 @@
                                 <h4>James Anderson</h4>
                                 <a href="https://outlook.office365.com/mail/deeplink/compose?to=janderson@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email James Anderson">
                                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                    <span class="email-label">email</span>
                                 </a>
                             </div>
                         </div>
@@ -1720,6 +1729,7 @@
                                 <h4>Maria Rodriguez</h4>
                                 <a href="https://outlook.office365.com/mail/deeplink/compose?to=mrodriguez@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Maria Rodriguez">
                                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                    <span class="email-label">email</span>
                                 </a>
                             </div>
                         </div>
@@ -1732,6 +1742,7 @@
                                 <h4>David Chen</h4>
                                 <a href="https://outlook.office365.com/mail/deeplink/compose?to=dchen@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email David Chen">
                                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                    <span class="email-label">email</span>
                                 </a>
                             </div>
                         </div>
@@ -1744,6 +1755,7 @@
                                 <h4>Emily Thompson</h4>
                                 <a href="https://outlook.office365.com/mail/deeplink/compose?to=ethompson@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Emily Thompson">
                                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                    <span class="email-label">email</span>
                                 </a>
                             </div>
                         </div>
@@ -1756,6 +1768,7 @@
                                 <h4>Michael Williams</h4>
                                 <a href="https://outlook.office365.com/mail/deeplink/compose?to=mwilliams@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Michael Williams">
                                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                    <span class="email-label">email</span>
                                 </a>
                             </div>
                         </div>
@@ -1768,6 +1781,7 @@
                                 <h4>Jessica Martinez</h4>
                                 <a href="https://outlook.office365.com/mail/deeplink/compose?to=jmartinez@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Jessica Martinez">
                                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                    <span class="email-label">email</span>
                                 </a>
                             </div>
                         </div>
@@ -1780,6 +1794,7 @@
                                 <h4>Christopher Brown</h4>
                                 <a href="https://outlook.office365.com/mail/deeplink/compose?to=cbrown@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Christopher Brown">
                                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                    <span class="email-label">email</span>
                                 </a>
                             </div>
                         </div>
@@ -1792,6 +1807,7 @@
                                 <h4>Ashley Davis</h4>
                                 <a href="https://outlook.office365.com/mail/deeplink/compose?to=adavis@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Ashley Davis">
                                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                    <span class="email-label">email</span>
                                 </a>
                             </div>
                         </div>
@@ -1804,6 +1820,7 @@
                                 <h4>Daniel Johnson</h4>
                                 <a href="https://outlook.office365.com/mail/deeplink/compose?to=djohnson@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Daniel Johnson">
                                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                    <span class="email-label">email</span>
                                 </a>
                             </div>
                         </div>
@@ -1816,6 +1833,7 @@
                                 <h4>Sarah Wilson</h4>
                                 <a href="https://outlook.office365.com/mail/deeplink/compose?to=swilson@students.daytonastate.edu" target="_blank" class="email-icon-link" title="Email Sarah Wilson">
                                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                    <span class="email-label">email</span>
                                 </a>
                             </div>
                         </div>
