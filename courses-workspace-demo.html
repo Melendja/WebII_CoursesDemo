@@ -394,6 +394,7 @@
 
         .content-wrapper.full-width {
             max-width: none;
+            padding-right: 2rem;
         }
 
         .content-breadcrumb {
@@ -1030,11 +1031,13 @@
             display: flex;
             gap: 2rem;
             margin-top: 1rem;
+            justify-content: space-between;
         }
 
         .project-main {
             flex: 1;
             min-width: 0;
+            max-width: 700px;
         }
 
         .project-team-panel {
@@ -1047,6 +1050,7 @@
             height: fit-content;
             position: sticky;
             top: 1rem;
+            margin-left: auto;
         }
 
         .team-header {
@@ -2289,7 +2293,7 @@
                 const activeProject = getActiveProject(parseInt(weekId));
                 if (!activeProject) return;
                 
-                contentArea.classList.remove('full-width');
+                contentArea.classList.add('full-width');
                 
                 const currentMilestone = activeProject.milestones.find(m => m.week == weekId);
                 
