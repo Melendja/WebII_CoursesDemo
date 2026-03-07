@@ -477,7 +477,7 @@ function logout() {
 /* ══════════════════════════════════════════════
    CONFIG — swap with your deployed API URL
 ══════════════════════════════════════════════ */
-const API = "https://daytona-lms-api.vercel.app/api";
+const API = "http://localhost:3000/api";
 
 const SEED = [
   {userId:1,firstName:"Jose",   lastName:"Melendez", email:"jose@test.com",          role:"ADMIN",      isActive:1,createdAt:"2026-02-18T23:33:38"},
@@ -507,7 +507,11 @@ async function req(path,method="GET",body=null){
 
 async function load(){
   try{ users=await req("/users"); demo=false; }
-  catch(_){ users=JSON.parse(JSON.stringify(SEED)); demo=true; }
+  catch(err){
+    console.warn("⚠️ API unreachable, using demo data.", err.message);
+    users=JSON.parse(JSON.stringify(SEED)); demo=true;
+    toast("⚠️ Using demo data — API offline","err");
+  }
   stats(); render();
 }
 
