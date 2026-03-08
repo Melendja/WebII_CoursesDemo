@@ -1712,7 +1712,7 @@
                             <div class="contact-info">
                                 <p class="role">Instructor</p>
                                 <h4>Dr. Sarah Mitchell</h4>
-                                <p>smitchell@daytonastate.edu</p>
+                                <p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fb8896928f98939e9797bb9f9a828f94959a888f9a8f9ed59e9f8e">[email&#160;protected]</a></p>
                                 <p>Office: Building A, Room 215</p>
                                 <p>Office Hours: Mon & Wed 2:00 PM - 4:00 PM</p>
                             </div>
@@ -1962,7 +1962,7 @@
                         <h3>Instructor Information</h3>
                         <table class="syllabus-table">
                             <tr><td><strong>Instructor:</strong></td><td>Dr. Sarah Mitchell</td></tr>
-                            <tr><td><strong>Email:</strong></td><td>smitchell@daytonastate.edu</td></tr>
+                            <tr><td><strong>Email:</strong></td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cab9a7a3bea9a2afa6a68aaeabb3bea5a4abb9beabbeafe4afaebf">[email&#160;protected]</a></td></tr>
                             <tr><td><strong>Office:</strong></td><td>Building A, Room 215</td></tr>
                             <tr><td><strong>Office Hours:</strong></td><td>Monday & Wednesday 2:00 PM - 4:00 PM (Virtual)</td></tr>
                         </table>
@@ -2042,7 +2042,7 @@
         </div>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // Course data structure - Extended weeks through May 8
         const courseData = {
             weeks: [
@@ -2632,13 +2632,9 @@
         }
 
         function updateProgress() {
-            const currentWeek = courseData.weeks.find(w => w.isCurrent);
-            const progress = (currentWeek.id / courseData.weeks.length) * 100;
-            document.getElementById('progressFill').style.width = `${progress}%`;
-        }
-
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', initMenu);
+    
+        updateProgress();
     </script>
+    <script src="db-connect.js"></script>
 </body>
 </html>
