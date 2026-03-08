@@ -19,8 +19,9 @@ const EMAIL_SVG  = `<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99
 
   /* ── Fetch helper ─────────────────────────────────────────── */
   async function get(path) {
-    // Adding query param avoids the ngrok browser warning without a custom header
-    const res = await fetch(DB_API + path + "?bypass=1");
+    const res = await fetch(DB_API + path, {
+      headers: { "ngrok-skip-browser-warning": "1" }
+    });
     if (!res.ok) throw new Error(`${res.status}`);
     return res.json();
   }
