@@ -1,0 +1,8 @@
+# Azure SQL connection
+DB_SERVER=cds-advtechcert.database.windows.net
+DB_DATABASE=daytona_lms
+DB_USER=lms_api
+DB_PASSWORD=LmsApi2026!
+
+# API port
+PORT=3000
