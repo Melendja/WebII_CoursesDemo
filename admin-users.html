@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin – User Management | Web Systems II</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:    #1a2d4a;
+      --navy-dk: #142238;
+      --navy-lt: #243a5e;
+      --amber:   #e8a020;
+      --teal:    #0e7569;
+      --teal-lt: #0f9688;
+      --blue:    #2563eb;
+      --red:     #dc2626;
+      --green:   #16a34a;
+      --border:  #e5e7eb;
+      --bg:      #f8f9fa;
+      --text:    #111827;
+      --text-md: #374151;
+      --text-sm: #6b7280;
+      --sw:      220px;
+      --hh:      52px;
+    }
+    body { font-family:'Open Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+    /* AUTH GUARD SCREEN */
+    #authGuard {
+      position:fixed; inset:0; background:var(--bg);
+      display:flex; align-items:center; justify-content:center;
+      z-index:9999; font-size:14px; color:var(--text-sm);
+    }
+
+    /* HEADER */
+    header {
+      position:fixed; top:0; left:0; right:0; z-index:200;
+      height:var(--hh); background:var(--navy);
+      display:flex; align-items:center;
+      border-bottom:2px solid var(--amber);
+    }
+    .hbrand {
+      width:var(--sw); display:flex; align-items:center; gap:10px;
+      padding:0 16px; flex-shrink:0; text-decoration:none;
+    }
+    .hicon {
+      width:32px; height:32px; border-radius:6px; background:#fff;
+      display:flex; align-items:center; justify-content:center; font-size:16px;
+    }
+    .htitle strong { display:block; font-size:13.5px; font-weight:700; color:#fff; }
+    .htitle span   { display:block; font-size:11px; color:#a8bcce; }
+    .hnav { flex:1; display:flex; align-items:center; justify-content:flex-end; padding:0 20px; gap:2px; }
+    .hnav a { color:#c5d5e8; font-size:12.5px; text-decoration:none; padding:6px 10px; border-radius:4px; transition:background .15s,color .15s; }
+    .hnav a:hover { background:var(--navy-lt); color:#fff; }
+    .hnav a.on { color:#fff; font-weight:600; }
+    .hnav .sp { color:#3d5570; padding:0 2px; font-size:11px; }
+
+    /* User badge + logout in header */
+    .huser {
+      display:flex; align-items:center; gap:8px;
+      padding:0 16px 0 8px;
+      border-left:1px solid #2d4566;
+    }
+    .havatar {
+      width:28px; height:28px; border-radius:50%;
+      background:linear-gradient(135deg,#0078d4,#00bcf2);
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; color:#fff; flex-shrink:0;
+    }
+    .huser-name { font-size:12.5px; color:#c5d5e8; font-weight:600; }
+    .btn-logout {
+      background:transparent; border:1px solid #3d5570; color:#a8bcce;
+      font-family:inherit; font-size:11.5px; font-weight:600;
+      padding:4px 10px; border-radius:4px; cursor:pointer;
+      transition:background .15s, color .15s;
+    }
+    .btn-logout:hover { background:#c0392b; border-color:#c0392b; color:#fff; }
+
+    /* LAYOUT */
+    .layout { display:flex; margin-top:var(--hh); min-height:calc(100vh - var(--hh)); }
+
+    /* SIDEBAR */
+    aside {
+      width:var(--sw); flex-shrink:0; position:fixed;
+      top:var(--hh); bottom:0; background:#fff;
+      border-right:1px solid var(--border); overflow-y:auto;
+    }
+    .slbl { font-size:10.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--text-sm); padding:16px 16px 6px; }
+    .sitem { border-bottom:1px solid #f1f3f5; position:relative; }
+    .srow {
+      display:flex; align-items:center; gap:8px; width:100%;
+      padding:10px 14px; font-size:13px; color:var(--text-md);
+      text-decoration:none; cursor:pointer; transition:background .12s;
+      background:none; border:none; font-family:inherit; text-align:left;
+    }
+    .srow:hover { background:#f9fafb; }
+    .srow.on { background:#eff6ff; color:var(--blue); font-weight:600; }
+    .srow.on::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--blue); }
+    .chev { margin-left:auto; font-size:11px; color:var(--text-sm); transition:transform .2s; }
+    .sitem.open .chev { transform:rotate(90deg); }
+    .bcur { font-size:9.5px; font-weight:700; background:var(--teal-lt); color:#fff; border-radius:3px; padding:1px 5px; text-transform:uppercase; }
+    .subnav { display:none; background:#f9fafb; }
+    .subnav.open { display:block; }
+    .subrow {
+      display:flex; align-items:center; gap:8px;
+      padding:8px 14px 8px 26px; font-size:12.5px; color:var(--text-md);
+      text-decoration:none; border-bottom:1px solid #f1f3f5; transition:background .12s;
+    }
+    .subrow:hover { background:#eff6ff; }
+    .subrow.on { color:var(--blue); font-weight:600; }
+    .dot { width:14px; height:14px; border-radius:3px; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; }
+
+    /* MAIN */
+    main { margin-left:var(--sw); flex:1; min-width:0; }
+    .crumb { display:flex; align-items:center; gap:6px; padding:12px 28px 0; font-size:12px; color:var(--text-sm); }
+    .crumb a { color:var(--text-sm); text-decoration:none; }
+    .crumb a:hover { color:var(--blue); text-decoration:underline; }
+    .crumb .sep { color:#d1d5db; }
+    .content { padding:18px 28px 48px; }
+    .ph { font-size:26px; font-weight:700; margin-bottom:3px; }
+    .ps { font-size:13px; color:var(--text-sm); margin-bottom:22px; }
+
+    /* STATS */
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
+    .sc { background:#fff; border:1px solid var(--border); border-radius:6px; padding:16px 18px; display:flex; align-items:center; gap:14px; }
+    .si { width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .si-t{background:#eff6ff;} .si-a{background:#fef2f2;} .si-i{background:#ecfdf5;} .si-s{background:#f5f3ff;}
+    .sv { font-size:22px; font-weight:700; line-height:1; }
+    .sl { font-size:11.5px; color:var(--text-sm); margin-top:2px; }
+
+    /* CARD */
+    .card { background:#fff; border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+    .card-hdr { display:flex; align-items:center; justify-content:space-between; padding:13px 18px; border-bottom:1px solid var(--border); gap:10px; flex-wrap:wrap; }
+    .card-title { font-size:13.5px; font-weight:700; display:flex; align-items:center; gap:8px; }
+    .cnt { background:#f3f4f6; color:var(--text-sm); font-size:11.5px; font-weight:600; padding:1px 7px; border-radius:10px; }
+    .toolbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .sw-wrap { position:relative; }
+    .sw-wrap input { padding:7px 10px 7px 30px; border:1px solid var(--border); border-radius:5px; font-family:inherit; font-size:12.5px; width:210px; background:#fff; transition:border-color .15s; }
+    .sw-wrap input:focus { outline:none; border-color:#93c5fd; }
+    .si-ico { position:absolute; left:9px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--text-sm); pointer-events:none; }
+    select.flt { padding:7px 10px; border:1px solid var(--border); border-radius:5px; font-family:inherit; font-size:12.5px; background:#fff; cursor:pointer; }
+    select.flt:focus { outline:none; border-color:#93c5fd; }
+
+    /* BUTTONS */
+    .btn { display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border-radius:5px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; border:none; transition:background .15s; white-space:nowrap; }
+    .btn-navy  { background:var(--navy); color:#fff; }
+    .btn-navy:hover { background:var(--navy-dk); }
+    .btn-red   { background:var(--red); color:#fff; }
+    .btn-red:hover { background:#b91c1c; }
+    .btn-out   { background:transparent; color:var(--text-md); border:1px solid var(--border); }
+    .btn-out:hover { background:#f3f4f6; }
+    .btn-sm    { padding:5px 10px; font-size:12px; }
+
+    /* TABLE */
+    .tw { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    thead th { background:#f9fafb; padding:10px 14px; text-align:left; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--text-sm); border-bottom:1px solid var(--border); white-space:nowrap; }
+    tbody tr { border-bottom:1px solid #f3f4f6; transition:background .1s; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:#f0f7ff; }
+    td { padding:11px 14px; vertical-align:middle; color:var(--text-md); }
+    .idc { color:var(--text-sm); font-size:12px; font-weight:600; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; }
+    .bADMIN      { background:#fee2e2; color:#991b1b; }
+    .bINSTRUCTOR { background:#dbeafe; color:#1e40af; }
+    .bSTUDENT    { background:#d1fae5; color:#065f46; }
+    .sp-pill { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; }
+    .sp-pill::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--green); }
+    .sp-pill.off::before { background:#9ca3af; }
+    .sp-pill.off { color:var(--text-sm); }
+    .acts { display:flex; gap:6px; }
+    .empty { text-align:center; padding:40px; color:var(--text-sm); font-size:13px; }
+    .ei { font-size:32px; margin-bottom:8px; opacity:.4; }
+
+    /* MODAL */
+    .ovl { display:none; position:fixed; inset:0; z-index:500; background:rgba(15,23,42,.45); align-items:center; justify-content:center; }
+    .ovl.open { display:flex; }
+    .modal { background:#fff; border-radius:8px; width:min(520px,95vw); max-height:90vh; overflow-y:auto; box-shadow:0 20px 50px rgba(0,0,0,.22); animation:pop .18s ease; }
+    @keyframes pop { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
+    .mhdr { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--navy); }
+    .mhdr h2 { font-size:15px; font-weight:700; color:#fff; }
+    .mcls { background:none; border:none; color:#8fa8be; font-size:20px; cursor:pointer; }
+    .mcls:hover { color:#fff; }
+    .mbdy { padding:20px; }
+    .mftr { display:flex; gap:8px; justify-content:flex-end; padding:14px 20px; border-top:1px solid var(--border); background:#f9fafb; }
+
+    /* FORM */
+    .fgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .fg { display:flex; flex-direction:column; gap:4px; }
+    .fg.full { grid-column:1/-1; }
+    label { font-size:12px; font-weight:700; color:var(--text-md); }
+    .fc { padding:8px 11px; border:1px solid var(--border); border-radius:5px; font-family:inherit; font-size:13px; transition:border-color .15s; }
+    .fc:focus { outline:none; border-color:#93c5fd; }
+    .fc.err { border-color:var(--red); }
+    .ferr { font-size:11.5px; color:var(--red); }
+    .fhnt { font-size:11.5px; color:var(--text-sm); }
+    .pwr { display:flex; gap:7px; }
+    .pwr .fc { flex:1; }
+    .togrow { display:flex; align-items:center; gap:10px; margin-top:4px; }
+    .tog { width:38px; height:21px; border-radius:11px; background:#d1d5db; position:relative; cursor:pointer; border:none; transition:background .2s; }
+    .tog.on { background:var(--green); }
+    .tog::after { content:""; position:absolute; top:3px; left:3px; width:15px; height:15px; border-radius:50%; background:#fff; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .tog.on::after { left:20px; }
+    .tlbl { font-size:12.5px; color:var(--text-md); }
+    .dico { text-align:center; font-size:34px; margin-bottom:8px; }
+    .dmsg { text-align:center; font-size:13.5px; color:var(--text-md); line-height:1.7; }
+    .dname { font-weight:700; color:var(--text); }
+
+    /* TOASTS */
+    #toasts { position:fixed; top:62px; right:16px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+    .toast { padding:11px 16px; border-radius:5px; font-size:13px; font-weight:600; color:#fff; box-shadow:0 4px 14px rgba(0,0,0,.18); animation:tin .2s ease; max-width:300px; }
+    .tok  { background:var(--green); }
+    .terr { background:var(--red); }
+    @keyframes tin { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+  </style>
+</head>
+<body>
+
+<!-- Auth guard overlay — hidden once verified -->
+<div id="authGuard">⏳ Verifying access…</div>
+
+<!-- HEADER -->
+<header>
+  <a href="courses-workspace-demo.html" class="hbrand">
+    <div class="hicon">🎓</div>
+    <div class="htitle"><strong>Web Systems II</strong><span>521F_SP26_ON</span></div>
+  </a>
+  <nav class="hnav">
+    <a href="#">Communications</a><span class="sp">|</span>
+    <a href="#">Syllabus</a><span class="sp">|</span>
+    <a href="#">Grades ▾</a><span class="sp">|</span>
+    <a href="#" class="on">Tools ▾</a><span class="sp">|</span>
+    <a href="#">Help ▾</a>
+  </nav>
+  <div class="huser">
+    <div class="havatar" id="hAvatar">A</div>
+    <span class="huser-name" id="hUserName">Admin</span>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="slbl">Admin Panel</div>
+    <div class="sitem open" id="si-users">
+      <button class="srow on" onclick="tog('si-users')">
+        <span>👥</span><span>User Management</span>
+        <span class="bcur" style="margin-left:4px">Active</span>
+        <span class="chev">›</span>
+      </button>
+      <div class="subnav open">
+        <a class="subrow on" href="admin-users.html">
+          <span class="dot" style="background:#1d4ed8">U</span>All Users
+        </a>
+      </div>
+    </div>
+    <div class="sitem" id="si-courses">
+      <button class="srow" onclick="tog('si-courses')">
+        <span>📚</span><span>Courses</span><span class="chev">›</span>
+      </button>
+      <div class="subnav">
+        <a class="subrow" href="#"><span class="dot" style="background:#1d4ed8">C</span>All Courses</a>
+      </div>
+    </div>
+    <div class="sitem" id="si-asgn">
+      <button class="srow" onclick="tog('si-asgn')">
+        <span>📝</span><span>Assignments</span><span class="chev">›</span>
+      </button>
+      <div class="subnav">
+        <a class="subrow" href="#"><span class="dot" style="background:#b91c1c">A</span>All Assignments</a>
+      </div>
+    </div>
+    <div class="sitem" id="si-enr">
+      <button class="srow" onclick="tog('si-enr')">
+        <span>📊</span><span>Enrollments</span><span class="chev">›</span>
+      </button>
+      <div class="subnav">
+        <a class="subrow" href="#"><span class="dot" style="background:#15803d">E</span>All Enrollments</a>
+      </div>
+    </div>
+    <div class="sitem" id="si-quiz">
+      <button class="srow" onclick="tog('si-quiz')">
+        <span>❓</span><span>Quizzes</span><span class="chev">›</span>
+      </button>
+      <div class="subnav">
+        <a class="subrow" href="#"><span class="dot" style="background:#6d28d9">Q</span>All Quizzes</a>
+      </div>
+    </div>
+    <div class="sitem" id="si-less">
+      <button class="srow" onclick="tog('si-less')">
+        <span>📖</span><span>Lessons</span><span class="chev">›</span>
+      </button>
+      <div class="subnav">
+        <a class="subrow" href="#"><span class="dot" style="background:#0e7569">L</span>All Lessons</a>
+      </div>
+    </div>
+    <div class="slbl" style="margin-top:8px">Navigation</div>
+    <div class="sitem">
+      <a class="srow" href="courses-workspace-demo.html"><span>🏠</span><span>Back to LMS</span></a>
+    </div>
+    <div class="sitem">
+      <button class="srow" onclick="logout()" style="width:100%;color:#dc2626">
+        <span>🚪</span><span>Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+    <div class="crumb">
+      <a href="courses-workspace-demo.html">🏠</a>
+      <span class="sep">›</span><a href="#">Admin</a>
+      <span class="sep">›</span><span>User Management</span>
+    </div>
+    <div class="content">
+      <div class="ph">User Management</div>
+      <div class="ps">daytona_lms &nbsp;›&nbsp; dbo.User &nbsp;·&nbsp; Add, edit, and delete LMS accounts</div>
+
+      <div class="stats">
+        <div class="sc"><div class="si si-t">👥</div><div><div class="sv" id="sTot">—</div><div class="sl">Total Users</div></div></div>
+        <div class="sc"><div class="si si-a">🔐</div><div><div class="sv" id="sAdm">—</div><div class="sl">Admins</div></div></div>
+        <div class="sc"><div class="si si-i">🎓</div><div><div class="sv" id="sIns">—</div><div class="sl">Instructors</div></div></div>
+        <div class="sc"><div class="si si-s">📖</div><div><div class="sv" id="sStu">—</div><div class="sl">Students</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">All Users <span class="cnt" id="cntLbl">0</span></div>
+          <div class="toolbar">
+            <div class="sw-wrap">
+              <span class="si-ico">🔍</span>
+              <input id="srch" type="text" placeholder="Search name or email…" oninput="render()" />
+            </div>
+            <select class="flt" id="rFlt" onchange="render()">
+              <option value="">All Roles</option>
+              <option value="ADMIN">Admin</option>
+              <option value="INSTRUCTOR">Instructor</option>
+              <option value="STUDENT">Student</option>
+            </select>
+            <select class="flt" id="sFlt" onchange="render()">
+              <option value="">All Statuses</option>
+              <option value="1">Active</option>
+              <option value="0">Inactive</option>
+            </select>
+            <button class="btn btn-navy" onclick="openAdd()">+ Add User</button>
+          </div>
+        </div>
+        <div class="tw">
+          <table>
+            <thead>
+              <tr>
+                <th>User ID</th><th>Name</th><th>Email</th>
+                <th>Role</th><th>Status</th><th>Created</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody">
+              <tr><td colspan="7"><div class="empty"><div class="ei">⏳</div>Loading users…</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="ovl" id="uModal">
+  <div class="modal">
+    <div class="mhdr">
+      <h2 id="mTitle">Add User</h2>
+      <button class="mcls" onclick="closeMod('uModal')">✕</button>
+    </div>
+    <div class="mbdy">
+      <div class="fgrid">
+        <div class="fg">
+          <label>First Name *</label>
+          <input class="fc" id="fFn" type="text" placeholder="Maria" />
+          <span class="ferr" id="eFn"></span>
+        </div>
+        <div class="fg">
+          <label>Last Name *</label>
+          <input class="fc" id="fLn" type="text" placeholder="Rodriguez" />
+          <span class="ferr" id="eLn"></span>
+        </div>
+        <div class="fg full">
+          <label>Email Address *</label>
+          <input class="fc" id="fEm" type="email" placeholder="user@daytona.edu" />
+          <span class="ferr" id="eEm"></span>
+        </div>
+        <div class="fg full" id="pwGrp">
+          <label>Temporary Password *</label>
+          <div class="pwr">
+            <input class="fc" id="fPw" type="text" placeholder="Auto-generate or enter…" />
+            <button type="button" class="btn btn-out" onclick="genPw()">⟳ Generate</button>
+          </div>
+          <p class="fhnt">User will be prompted to reset on first login.</p>
+          <span class="ferr" id="ePw"></span>
+        </div>
+        <div class="fg">
+          <label>Role *</label>
+          <select class="fc" id="fRl">
+            <option value="">— Select —</option>
+            <option value="STUDENT">Student</option>
+            <option value="INSTRUCTOR">Instructor</option>
+            <option value="ADMIN">Admin</option>
+          </select>
+          <span class="ferr" id="eRl"></span>
+        </div>
+        <div class="fg">
+          <label>Account Status</label>
+          <div class="togrow" style="margin-top:6px">
+            <button type="button" class="tog on" id="fAc" onclick="toggleAc()"></button>
+            <span class="tlbl" id="tlbl">Active</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mftr">
+      <button class="btn btn-out" onclick="closeMod('uModal')">Cancel</button>
+      <button class="btn btn-navy" id="savBtn" onclick="saveUser()">Save User</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="ovl" id="dModal">
+  <div class="modal" style="max-width:360px">
+    <div class="mhdr">
+      <h2>Confirm Delete</h2>
+      <button class="mcls" onclick="closeMod('dModal')">✕</button>
+    </div>
+    <div class="mbdy" style="padding:24px 20px">
+      <div class="dico">🗑️</div>
+      <p class="dmsg">
+        You are about to permanently delete<br/>
+        <span class="dname" id="dName"></span><br/>
+        <span style="color:var(--red);font-weight:600">This action cannot be undone.</span>
+      </p>
+    </div>
+    <div class="mftr">
+      <button class="btn btn-out" onclick="closeMod('dModal')">Cancel</button>
+      <button class="btn btn-red" onclick="confirmDel()">Delete User</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+/* ══════════════════════════════════════════════
+   AUTH GUARD — runs before anything else
+══════════════════════════════════════════════ */
+(function() {
+  if (sessionStorage.getItem("lms_auth") !== "true") {
+    window.location.replace("login.html");
+  } else {
+    // Reveal page
+    document.getElementById("authGuard").style.display = "none";
+    // Set username display
+    const uname = sessionStorage.getItem("lms_user") || "Admin";
+    document.getElementById("hUserName").textContent = uname;
+    document.getElementById("hAvatar").textContent   = uname.charAt(0).toUpperCase();
+  }
+})();
+
+function logout() {
+  sessionStorage.removeItem("lms_auth");
+  sessionStorage.removeItem("lms_user");
+  window.location.href = "login.html";
+}
+
+/* ══════════════════════════════════════════════
+   CONFIG — swap with your deployed API URL
+══════════════════════════════════════════════ */
+const API = "http://localhost:3000/api";
+
+const SEED = [
+  {userId:1,firstName:"Jose",   lastName:"Melendez", email:"jose@test.com",          role:"ADMIN",      isActive:1,createdAt:"2026-02-18T23:33:38"},
+  {userId:2,firstName:"Ronald", lastName:"Eaglin",   email:"instructor@daytona.edu", role:"INSTRUCTOR", isActive:1,createdAt:"2026-02-18T23:45:28"},
+  {userId:3,firstName:"Maria",  lastName:"Rodriguez",email:"student1@daytona.edu",   role:"STUDENT",    isActive:1,createdAt:"2026-02-18T23:45:28"},
+  {userId:4,firstName:"James",  lastName:"Wilson",   email:"student2@daytona.edu",   role:"STUDENT",    isActive:1,createdAt:"2026-02-18T23:45:28"},
+];
+
+let users=[], demo=false, editId=null, delId=null, isAc=true;
+
+/* sidebar toggle */
+function tog(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('open');
+  const sub=el.querySelector('.subnav');
+  if(sub) sub.classList.toggle('open');
+}
+
+/* api */
+async function req(path,method="GET",body=null){
+  const o={method,headers:{"Content-Type":"application/json"}};
+  if(body) o.body=JSON.stringify(body);
+  const r=await fetch(API+path,o);
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+async function load(){
+  try{ users=await req("/users"); demo=false; }
+  catch(err){
+    console.warn("⚠️ API unreachable, using demo data.", err.message);
+    users=JSON.parse(JSON.stringify(SEED)); demo=true;
+    toast("⚠️ Using demo data — API offline","err");
+  }
+  stats(); render();
+}
+
+function stats(){
+  document.getElementById("sTot").textContent=users.length;
+  document.getElementById("sAdm").textContent=users.filter(u=>u.role==="ADMIN").length;
+  document.getElementById("sIns").textContent=users.filter(u=>u.role==="INSTRUCTOR").length;
+  document.getElementById("sStu").textContent=users.filter(u=>u.role==="STUDENT").length;
+}
+
+function render(){
+  const q=document.getElementById("srch").value.toLowerCase();
+  const r=document.getElementById("rFlt").value;
+  const s=document.getElementById("sFlt").value;
+  const f=users.filter(u=>{
+    const n=`${u.firstName} ${u.lastName} ${u.email}`.toLowerCase();
+    return(!q||n.includes(q))&&(!r||u.role===r)&&(s===""||String(u.isActive)===s);
+  });
+  document.getElementById("cntLbl").textContent=f.length;
+  const tb=document.getElementById("tbody");
+  if(!f.length){tb.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="ei">🔍</div>No users found.</div></td></tr>`;return;}
+  tb.innerHTML=f.map(u=>`
+    <tr>
+      <td class="idc">#${u.userId}</td>
+      <td><strong>${esc(u.firstName)} ${esc(u.lastName)}</strong></td>
+      <td style="font-size:12.5px">${esc(u.email)}</td>
+      <td><span class="badge b${u.role}">${u.role}</span></td>
+      <td><span class="sp-pill${u.isActive?'':' off'}">${u.isActive?'Active':'Inactive'}</span></td>
+      <td style="font-size:12px;color:var(--text-sm)">${fmt(u.createdAt)}</td>
+      <td><div class="acts">
+        <button class="btn btn-out btn-sm" onclick="openEdit(${u.userId})">✏️ Edit</button>
+        <button class="btn btn-red btn-sm" onclick="openDel(${u.userId})">🗑️</button>
+      </div></td>
+    </tr>
+  `).join("");
+}
+
+const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function fmt(d){try{return new Date(d).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});}catch(_){return d||"—";}}
+
+function toast(m,t="ok"){
+  const el=document.createElement("div");
+  el.className=`toast ${t==="ok"?"tok":"terr"}`;el.textContent=m;
+  document.getElementById("toasts").appendChild(el);
+  setTimeout(()=>el.remove(),3200);
+}
+function genPw(){
+  const c="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$";
+  let p="";for(let i=0;i<12;i++)p+=c[Math.floor(Math.random()*c.length)];
+  document.getElementById("fPw").value=p;
+}
+function toggleAc(){
+  isAc=!isAc;
+  document.getElementById("fAc").classList.toggle("on",isAc);
+  document.getElementById("tlbl").textContent=isAc?"Active":"Inactive";
+}
+function closeMod(id){document.getElementById(id).classList.remove("open");}
+function clrForm(){
+  ["fFn","fLn","fEm","fPw","fRl"].forEach(f=>document.getElementById(f).value="");
+  ["eFn","eLn","eEm","ePw","eRl"].forEach(f=>document.getElementById(f).textContent="");
+  ["fFn","fLn","fEm","fPw","fRl"].forEach(f=>document.getElementById(f).classList.remove("err"));
+  isAc=true;
+  document.getElementById("fAc").classList.add("on");
+  document.getElementById("tlbl").textContent="Active";
+}
+function validate(){
+  let ok=true;
+  const fields=[["fFn","eFn","First name"],["fLn","eLn","Last name"],["fEm","eEm","Email"],["fRl","eRl","Role"]];
+  if(!editId) fields.push(["fPw","ePw","Password"]);
+  fields.forEach(([fi,ei,lbl])=>{
+    const v=document.getElementById(fi).value.trim();
+    const e=document.getElementById(ei);
+    if(!v){if(e)e.textContent=lbl+" is required.";document.getElementById(fi).classList.add("err");ok=false;}
+    else{if(e)e.textContent="";document.getElementById(fi).classList.remove("err");}
+  });
+  const em=document.getElementById("fEm").value.trim();
+  if(em&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){
+    document.getElementById("eEm").textContent="Invalid email.";
+    document.getElementById("fEm").classList.add("err");ok=false;
+  }
+  return ok;
+}
+function openAdd(){
+  editId=null;clrForm();
+  document.getElementById("mTitle").textContent="Add User";
+  document.getElementById("pwGrp").style.display="block";
+  document.getElementById("savBtn").textContent="Save User";
+  document.getElementById("uModal").classList.add("open");
+  genPw();
+}
+function openEdit(id){
+  const u=users.find(x=>x.userId===id);if(!u)return;
+  editId=id;clrForm();
+  document.getElementById("fFn").value=u.firstName||"";
+  document.getElementById("fLn").value=u.lastName||"";
+  document.getElementById("fEm").value=u.email||"";
+  document.getElementById("fRl").value=u.role||"";
+  isAc=!!u.isActive;
+  document.getElementById("fAc").classList.toggle("on",isAc);
+  document.getElementById("tlbl").textContent=isAc?"Active":"Inactive";
+  document.getElementById("pwGrp").style.display="none";
+  document.getElementById("mTitle").textContent="Edit User";
+  document.getElementById("savBtn").textContent="Update User";
+  document.getElementById("uModal").classList.add("open");
+}
+async function saveUser(){
+  if(!validate())return;
+  const body={
+    firstName:document.getElementById("fFn").value.trim(),
+    lastName:document.getElementById("fLn").value.trim(),
+    email:document.getElementById("fEm").value.trim(),
+    role:document.getElementById("fRl").value,
+    isActive:isAc?1:0,
+  };
+  if(!editId) body.password=document.getElementById("fPw").value.trim();
+  try{
+    if(!editId){
+      if(demo){body.userId=users.length?Math.max(...users.map(u=>u.userId))+1:1;body.createdAt=new Date().toISOString();users.push(body);}
+      else{users.push(await req("/users","POST",body));}
+      toast("✅ User created successfully!");
+    } else {
+      if(demo){const i=users.findIndex(u=>u.userId===editId);if(i>-1)users[i]={...users[i],...body};}
+      else{const u=await req(`/users/${editId}`,"PUT",body);const i=users.findIndex(x=>x.userId===editId);if(i>-1)users[i]=u;}
+      toast("✏️ User updated!");
+    }
+    closeMod("uModal");stats();render();
+  }catch(e){toast("❌ "+e.message,"err");}
+}
+function openDel(id){
+  delId=id;
+  const u=users.find(x=>x.userId===id);
+  document.getElementById("dName").textContent=u?`${u.firstName} ${u.lastName} (${u.email})`:`User #${id}`;
+  document.getElementById("dModal").classList.add("open");
+}
+async function confirmDel(){
+  try{
+    if(!demo) await req(`/users/${delId}`,"DELETE");
+    users=users.filter(u=>u.userId!==delId);
+    toast("🗑️ User deleted.");
+    closeMod("dModal");stats();render();
+  }catch(e){toast("❌ "+e.message,"err");}
+}
+document.querySelectorAll(".ovl").forEach(o=>{
+  o.addEventListener("click",ev=>{if(ev.target===o)o.classList.remove("open");});
+});
+
+load();
+</script>
+</body>
+</html>
