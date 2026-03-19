@@ -2092,11 +2092,11 @@
             const instructor = grid.querySelector('.contact-card.instructor');
             const students = Array.from(grid.querySelectorAll('.contact-card:not(.instructor)'));
             students.sort((a, b) => {
-                const lastName = el => {
+                const firstName = el => {
                     const parts = (el.querySelector('h4')?.textContent.trim() || '').split(' ');
-                    return parts[parts.length - 1].toLowerCase();
+                    return parts[0].toLowerCase();
                 };
-                return lastName(a).localeCompare(lastName(b));
+                return firstName(a).localeCompare(firstName(b));
             });
             // Re-order: instructor first, then sorted students
             if (instructor) grid.appendChild(instructor);
