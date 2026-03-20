@@ -2198,6 +2198,13 @@
             
             header.classList.toggle('expanded');
             subitems.classList.toggle('expanded');
+
+            // Update the welcome panel due dates to reflect the clicked week
+            // (only if the content area is currently showing the welcome panel)
+            const contentArea = document.getElementById('contentArea');
+            if (contentArea.querySelector('.content-title')) {
+                showWelcomeContent(weekId);
+            }
         }
 
         function selectItem(weekId, itemId) {
@@ -2440,9 +2447,74 @@
             return colors[letter] || '#718096';
         }
 
-        function showWelcomeContent() {
+        // All course due dates keyed by ISO date string
+        const allDueDates = [
+            { date: '2026-01-31', month: 'JAN', day: '31', title: 'Week 2 Discussion Post', type: 'Discussion',  isProject: false },
+            { date: '2026-01-31', month: 'JAN', day: '31', title: 'Week 2 Quiz',            type: 'Quiz',        isProject: false },
+            { date: '2026-02-07', month: 'FEB', day: '7',  title: 'Week 3 Assignment',      type: 'Assignment',  isProject: false },
+            { date: '2026-02-14', month: 'FEB', day: '14', title: 'Week 4 Assignment',       type: 'Assignment',  isProject: false },
+            { date: '2026-02-14', month: 'FEB', day: '14', title: 'Week 4 Quiz',             type: 'Quiz',        isProject: false },
+            { date: '2026-02-21', month: 'FEB', day: '21', title: 'Week 5 Assignment',       type: 'Assignment',  isProject: false },
+            { date: '2026-02-21', month: 'FEB', day: '21', title: 'Week 5 Discussion Post',  type: 'Discussion',  isProject: false },
+            { date: '2026-02-28', month: 'FEB', day: '28', title: 'Week 6 Assignment',       type: 'Assignment',  isProject: false },
+            { date: '2026-02-28', month: 'FEB', day: '28', title: 'Week 6 Quiz',             type: 'Quiz',        isProject: false },
+            { date: '2026-03-07', month: 'MAR', day: '7',  title: 'Project 1: Web Application Development', type: 'Project', isProject: true, startLabel: 'Starts Feb 8' },
+            { date: '2026-03-07', month: 'MAR', day: '7',  title: 'Week 7 Assignment',       type: 'Assignment',  isProject: false },
+            { date: '2026-03-14', month: 'MAR', day: '14', title: 'Week 8 Assignment',       type: 'Assignment',  isProject: false },
+            { date: '2026-03-14', month: 'MAR', day: '14', title: 'Week 8 Quiz',             type: 'Quiz',        isProject: false },
+            { date: '2026-03-21', month: 'MAR', day: '21', title: 'Week 9 Assignment',       type: 'Assignment',  isProject: false },
+            { date: '2026-03-21', month: 'MAR', day: '21', title: 'Week 9 Discussion Post',  type: 'Discussion',  isProject: false },
+            { date: '2026-03-28', month: 'MAR', day: '28', title: 'Week 10 Assignment',      type: 'Assignment',  isProject: false },
+            { date: '2026-03-28', month: 'MAR', day: '28', title: 'Week 10 Quiz',            type: 'Quiz',        isProject: false },
+            { date: '2026-04-04', month: 'APR', day: '4',  title: 'Week 11 Assignment',      type: 'Assignment',  isProject: false },
+            { date: '2026-04-04', month: 'APR', day: '4',  title: 'Week 11 Discussion Post', type: 'Discussion',  isProject: false },
+            { date: '2026-04-11', month: 'APR', day: '11', title: 'Week 12 Assignment',      type: 'Assignment',  isProject: false },
+            { date: '2026-04-11', month: 'APR', day: '11', title: 'Week 12 Quiz',            type: 'Quiz',        isProject: false },
+            { date: '2026-04-18', month: 'APR', day: '18', title: 'Week 13 Assignment',      type: 'Assignment',  isProject: false },
+            { date: '2026-04-18', month: 'APR', day: '18', title: 'Week 13 Discussion Post', type: 'Discussion',  isProject: false },
+            { date: '2026-04-25', month: 'APR', day: '25', title: 'Week 14 Assignment',      type: 'Assignment',  isProject: false },
+            { date: '2026-04-25', month: 'APR', day: '25', title: 'Week 14 Quiz',            type: 'Quiz',        isProject: false },
+            { date: '2026-05-02', month: 'MAY', day: '2',  title: 'Week 15 Assignment',      type: 'Assignment',  isProject: false },
+            { date: '2026-05-02', month: 'MAY', day: '2',  title: 'Week 15 Discussion Post', type: 'Discussion',  isProject: false },
+            { date: '2026-05-08', month: 'MAY', day: '8',  title: 'Project 2: API Integration & Database', type: 'Project', isProject: true, startLabel: 'Starts Mar 22' },
+            { date: '2026-05-08', month: 'MAY', day: '8',  title: 'Week 16 Final Submission', type: 'Assignment', isProject: false },
+        ];
+
+        function getUpcomingDueDates(fromWeekId) {
+            const week = courseData.weeks.find(w => w.id == fromWeekId);
+            if (!week) return [];
+            const cutoff = new Date(week.start);
+            cutoff.setHours(0, 0, 0, 0);
+            return allDueDates
+                .filter(d => new Date(d.date) >= cutoff)
+                .slice(0, 6); // Show next 6 items
+        }
+
+        function buildDueDateHTML(item) {
+            const calClass = item.isProject ? 'due-date-calendar project' : 'due-date-calendar';
+            const rowClass = item.isProject ? 'due-date-item project-due' : 'due-date-item';
+            const typeHTML = item.isProject
+                ? `Project <span class="project-start">• ${item.startLabel}</span>`
+                : item.type;
+            return `
+                            <div class="${rowClass}">
+                                <div class="${calClass}">
+                                    <span class="due-month">${item.month}</span>
+                                    <span class="due-day">${item.day}</span>
+                                </div>
+                                <div class="due-date-info">
+                                    <span class="due-title">${item.title}</span>
+                                    <span class="due-type">${typeHTML}</span>
+                                </div>
+                            </div>`;
+        }
+
+        function showWelcomeContent(selectedWeekId) {
             const contentArea = document.getElementById('contentArea');
-            const currentWeek = courseData.weeks.find(w => w.isCurrent);
+            const currentWeek = courseData.weeks.find(w => w.isCurrent) || courseData.weeks[0];
+            const displayWeek = selectedWeekId
+                ? (courseData.weeks.find(w => w.id == selectedWeekId) || currentWeek)
+                : currentWeek;
             
             // Remove active state from any selected items
             document.querySelectorAll('.sub-item').forEach(item => {
@@ -2451,10 +2523,11 @@
             
             // Remove full-width class if present
             contentArea.classList.remove('full-width');
-            
-            // Get active projects for due dates display
-            const project1 = courseData.projects.project1;
-            const project2 = courseData.projects.project2;
+
+            const upcoming = getUpcomingDueDates(displayWeek.id);
+            const dueDatesHTML = upcoming.length
+                ? upcoming.map(buildDueDateHTML).join('')
+                : '<p style="color:#718096;font-style:italic;padding:8px 0">No upcoming due dates for this week.</p>';
             
             contentArea.innerHTML = `
                 <div class="content-breadcrumb">
@@ -2467,7 +2540,7 @@
                 <p class="content-subtitle">521F_SP26_ON • Spring 2026</p>
                 
                 <div class="content-section">
-                    <h3>📍 Current Week: ${currentWeek.title} (${currentWeek.dates})</h3>
+                    <h3>📍 ${displayWeek.isCurrent ? 'Current Week' : 'Selected Week'}: ${displayWeek.title} (${displayWeek.dates})</h3>
                     <div class="content-card">
                         <h4>Notice(s):</h4>
                         <p class="notice-placeholder">No notices at this time.</p>
@@ -2476,56 +2549,7 @@
                     <div class="content-card">
                         <h4>Next Due Dates:</h4>
                         <div class="due-dates-list">
-                            <div class="due-date-item">
-                                <div class="due-date-calendar">
-                                    <span class="due-month">JAN</span>
-                                    <span class="due-day">31</span>
-                                </div>
-                                <div class="due-date-info">
-                                    <span class="due-title">Week 2 Discussion Post</span>
-                                    <span class="due-type">Discussion</span>
-                                </div>
-                            </div>
-                            <div class="due-date-item">
-                                <div class="due-date-calendar">
-                                    <span class="due-month">JAN</span>
-                                    <span class="due-day">31</span>
-                                </div>
-                                <div class="due-date-info">
-                                    <span class="due-title">Week 2 Quiz</span>
-                                    <span class="due-type">Quiz</span>
-                                </div>
-                            </div>
-                            <div class="due-date-item">
-                                <div class="due-date-calendar">
-                                    <span class="due-month">FEB</span>
-                                    <span class="due-day">7</span>
-                                </div>
-                                <div class="due-date-info">
-                                    <span class="due-title">Week 3 Assignment</span>
-                                    <span class="due-type">Assignment</span>
-                                </div>
-                            </div>
-                            <div class="due-date-item project-due">
-                                <div class="due-date-calendar project">
-                                    <span class="due-month">MAR</span>
-                                    <span class="due-day">7</span>
-                                </div>
-                                <div class="due-date-info">
-                                    <span class="due-title">${project1.name}</span>
-                                    <span class="due-type">Project <span class="project-start">• Starts Feb 8</span></span>
-                                </div>
-                            </div>
-                            <div class="due-date-item project-due">
-                                <div class="due-date-calendar project">
-                                    <span class="due-month">MAY</span>
-                                    <span class="due-day">8</span>
-                                </div>
-                                <div class="due-date-info">
-                                    <span class="due-title">${project2.name}</span>
-                                    <span class="due-type">Project <span class="project-start">• Starts Mar 22</span></span>
-                                </div>
-                            </div>
+                            ${dueDatesHTML}
                         </div>
                         <p class="placeholder-note"><em>This section will be populated from the course calendar feed.</em></p>
                     </div>
