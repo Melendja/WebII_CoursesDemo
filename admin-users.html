@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin – User Management | Web Systems II</title>
+  <title>Admin Panel | Web Systems II</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
@@ -28,7 +28,6 @@
     }
     body { font-family:'Open Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
 
-    /* AUTH GUARD SCREEN */
     #authGuard {
       position:fixed; inset:0; background:var(--bg);
       display:flex; align-items:center; justify-content:center;
@@ -42,14 +41,8 @@
       display:flex; align-items:center;
       border-bottom:2px solid var(--amber);
     }
-    .hbrand {
-      width:var(--sw); display:flex; align-items:center; gap:10px;
-      padding:0 16px; flex-shrink:0; text-decoration:none;
-    }
-    .hicon {
-      width:32px; height:32px; border-radius:6px; background:#fff;
-      display:flex; align-items:center; justify-content:center; font-size:16px;
-    }
+    .hbrand { width:var(--sw); display:flex; align-items:center; gap:10px; padding:0 16px; flex-shrink:0; text-decoration:none; }
+    .hicon { width:32px; height:32px; border-radius:6px; background:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; }
     .htitle strong { display:block; font-size:13.5px; font-weight:700; color:#fff; }
     .htitle span   { display:block; font-size:11px; color:#a8bcce; }
     .hnav { flex:1; display:flex; align-items:center; justify-content:flex-end; padding:0 20px; gap:2px; }
@@ -57,45 +50,20 @@
     .hnav a:hover { background:var(--navy-lt); color:#fff; }
     .hnav a.on { color:#fff; font-weight:600; }
     .hnav .sp { color:#3d5570; padding:0 2px; font-size:11px; }
-
-    /* User badge + logout in header */
-    .huser {
-      display:flex; align-items:center; gap:8px;
-      padding:0 16px 0 8px;
-      border-left:1px solid #2d4566;
-    }
-    .havatar {
-      width:28px; height:28px; border-radius:50%;
-      background:linear-gradient(135deg,#0078d4,#00bcf2);
-      display:flex; align-items:center; justify-content:center;
-      font-size:11px; font-weight:700; color:#fff; flex-shrink:0;
-    }
+    .huser { display:flex; align-items:center; gap:8px; padding:0 16px 0 8px; border-left:1px solid #2d4566; }
+    .havatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#0078d4,#00bcf2); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; flex-shrink:0; }
     .huser-name { font-size:12.5px; color:#c5d5e8; font-weight:600; }
-    .btn-logout {
-      background:transparent; border:1px solid #3d5570; color:#a8bcce;
-      font-family:inherit; font-size:11.5px; font-weight:600;
-      padding:4px 10px; border-radius:4px; cursor:pointer;
-      transition:background .15s, color .15s;
-    }
+    .btn-logout { background:transparent; border:1px solid #3d5570; color:#a8bcce; font-family:inherit; font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:4px; cursor:pointer; transition:background .15s, color .15s; }
     .btn-logout:hover { background:#c0392b; border-color:#c0392b; color:#fff; }
 
     /* LAYOUT */
     .layout { display:flex; margin-top:var(--hh); min-height:calc(100vh - var(--hh)); }
 
     /* SIDEBAR */
-    aside {
-      width:var(--sw); flex-shrink:0; position:fixed;
-      top:var(--hh); bottom:0; background:#fff;
-      border-right:1px solid var(--border); overflow-y:auto;
-    }
+    aside { width:var(--sw); flex-shrink:0; position:fixed; top:var(--hh); bottom:0; background:#fff; border-right:1px solid var(--border); overflow-y:auto; }
     .slbl { font-size:10.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--text-sm); padding:16px 16px 6px; }
     .sitem { border-bottom:1px solid #f1f3f5; position:relative; }
-    .srow {
-      display:flex; align-items:center; gap:8px; width:100%;
-      padding:10px 14px; font-size:13px; color:var(--text-md);
-      text-decoration:none; cursor:pointer; transition:background .12s;
-      background:none; border:none; font-family:inherit; text-align:left;
-    }
+    .srow { display:flex; align-items:center; gap:8px; width:100%; padding:10px 14px; font-size:13px; color:var(--text-md); text-decoration:none; cursor:pointer; transition:background .12s; background:none; border:none; font-family:inherit; text-align:left; }
     .srow:hover { background:#f9fafb; }
     .srow.on { background:#eff6ff; color:var(--blue); font-weight:600; }
     .srow.on::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--blue); }
@@ -104,11 +72,7 @@
     .bcur { font-size:9.5px; font-weight:700; background:var(--teal-lt); color:#fff; border-radius:3px; padding:1px 5px; text-transform:uppercase; }
     .subnav { display:none; background:#f9fafb; }
     .subnav.open { display:block; }
-    .subrow {
-      display:flex; align-items:center; gap:8px;
-      padding:8px 14px 8px 26px; font-size:12.5px; color:var(--text-md);
-      text-decoration:none; border-bottom:1px solid #f1f3f5; transition:background .12s;
-    }
+    .subrow { display:flex; align-items:center; gap:8px; padding:8px 14px 8px 26px; font-size:12.5px; color:var(--text-md); text-decoration:none; border-bottom:1px solid #f1f3f5; transition:background .12s; cursor:pointer; }
     .subrow:hover { background:#eff6ff; }
     .subrow.on { color:var(--blue); font-weight:600; }
     .dot { width:14px; height:14px; border-radius:3px; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; }
@@ -116,7 +80,7 @@
     /* MAIN */
     main { margin-left:var(--sw); flex:1; min-width:0; }
     .crumb { display:flex; align-items:center; gap:6px; padding:12px 28px 0; font-size:12px; color:var(--text-sm); }
-    .crumb a { color:var(--text-sm); text-decoration:none; }
+    .crumb a { color:var(--text-sm); text-decoration:none; cursor:pointer; }
     .crumb a:hover { color:var(--blue); text-decoration:underline; }
     .crumb .sep { color:#d1d5db; }
     .content { padding:18px 28px 48px; }
@@ -148,11 +112,15 @@
     .btn { display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border-radius:5px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; border:none; transition:background .15s; white-space:nowrap; }
     .btn-navy  { background:var(--navy); color:#fff; }
     .btn-navy:hover { background:var(--navy-dk); }
+    .btn-teal  { background:var(--teal); color:#fff; }
+    .btn-teal:hover { background:#0b6158; }
     .btn-red   { background:var(--red); color:#fff; }
     .btn-red:hover { background:#b91c1c; }
     .btn-out   { background:transparent; color:var(--text-md); border:1px solid var(--border); }
     .btn-out:hover { background:#f3f4f6; }
     .btn-sm    { padding:5px 10px; font-size:12px; }
+    .btn-back  { background:transparent; color:var(--blue); border:none; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; padding:0; margin-bottom:12px; display:inline-flex; align-items:center; gap:4px; }
+    .btn-back:hover { text-decoration:underline; }
 
     /* TABLE */
     .tw { overflow-x:auto; }
@@ -161,12 +129,15 @@
     tbody tr { border-bottom:1px solid #f3f4f6; transition:background .1s; }
     tbody tr:last-child { border-bottom:none; }
     tbody tr:hover { background:#f0f7ff; }
-    td { padding:11px 14px; vertical-align:middle; color:var(--text-md); }
+    td { padding:11px 14px; vertical-align:top; color:var(--text-md); }
     .idc { color:var(--text-sm); font-size:12px; font-weight:600; }
     .badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; }
     .bADMIN      { background:#fee2e2; color:#991b1b; }
     .bINSTRUCTOR { background:#dbeafe; color:#1e40af; }
     .bSTUDENT    { background:#d1fae5; color:#065f46; }
+    .bActive     { background:#d1fae5; color:#065f46; }
+    .bInactive   { background:#fee2e2; color:#991b1b; }
+    .bDraft      { background:#f3f4f6; color:#6b7280; }
     .sp-pill { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; }
     .sp-pill::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--green); }
     .sp-pill.off::before { background:#9ca3af; }
@@ -174,11 +145,24 @@
     .acts { display:flex; gap:6px; }
     .empty { text-align:center; padding:40px; color:var(--text-sm); font-size:13px; }
     .ei { font-size:32px; margin-bottom:8px; opacity:.4; }
+    .link-title { color:var(--blue); cursor:pointer; font-weight:600; text-decoration:none; }
+    .link-title:hover { text-decoration:underline; }
+
+    /* Additional Material inline */
+    .mat-list { margin-top:6px; padding-top:6px; border-top:1px dashed var(--border); }
+    .mat-label { font-size:11px; font-weight:700; color:var(--text-sm); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+    .mat-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-md); padding:2px 0; }
+    .mat-item a { color:var(--blue); text-decoration:none; font-weight:500; }
+    .mat-item a:hover { text-decoration:underline; }
+    .mat-del { background:none; border:none; color:var(--red); font-size:11px; cursor:pointer; padding:0 2px; opacity:.6; }
+    .mat-del:hover { opacity:1; }
+    .btn-add-mat { font-size:11.5px; color:var(--teal); cursor:pointer; background:none; border:none; font-family:inherit; font-weight:600; padding:3px 0; }
+    .btn-add-mat:hover { text-decoration:underline; }
 
     /* MODAL */
     .ovl { display:none; position:fixed; inset:0; z-index:500; background:rgba(15,23,42,.45); align-items:center; justify-content:center; }
     .ovl.open { display:flex; }
-    .modal { background:#fff; border-radius:8px; width:min(520px,95vw); max-height:90vh; overflow-y:auto; box-shadow:0 20px 50px rgba(0,0,0,.22); animation:pop .18s ease; }
+    .modal { background:#fff; border-radius:8px; width:min(580px,95vw); max-height:90vh; overflow-y:auto; box-shadow:0 20px 50px rgba(0,0,0,.22); animation:pop .18s ease; }
     @keyframes pop { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
     .mhdr { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--navy); }
     .mhdr h2 { font-size:15px; font-weight:700; color:#fff; }
@@ -186,8 +170,6 @@
     .mcls:hover { color:#fff; }
     .mbdy { padding:20px; }
     .mftr { display:flex; gap:8px; justify-content:flex-end; padding:14px 20px; border-top:1px solid var(--border); background:#f9fafb; }
-
-    /* FORM */
     .fgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .fg { display:flex; flex-direction:column; gap:4px; }
     .fg.full { grid-column:1/-1; }
@@ -197,6 +179,7 @@
     .fc.err { border-color:var(--red); }
     .ferr { font-size:11.5px; color:var(--red); }
     .fhnt { font-size:11.5px; color:var(--text-sm); }
+    textarea.fc { resize:vertical; min-height:70px; }
     .pwr { display:flex; gap:7px; }
     .pwr .fc { flex:1; }
     .togrow { display:flex; align-items:center; gap:10px; margin-top:4px; }
@@ -219,7 +202,6 @@
 </head>
 <body>
 
-<!-- Auth guard overlay — hidden once verified -->
 <div id="authGuard">⏳ Verifying access…</div>
 
 <!-- HEADER -->
@@ -243,32 +225,35 @@
 </header>
 
 <div class="layout">
-
   <!-- SIDEBAR -->
   <aside>
     <div class="slbl">Admin Panel</div>
     <div class="sitem open" id="si-users">
-      <button class="srow on" onclick="tog('si-users')">
+      <button class="srow on" id="sr-users" onclick="togSec('si-users')">
         <span>👥</span><span>User Management</span>
-        <span class="bcur" style="margin-left:4px">Active</span>
+        <span class="bcur" id="bcur-users" style="margin-left:4px">Active</span>
         <span class="chev">›</span>
       </button>
       <div class="subnav open">
-        <a class="subrow on" href="admin-users.html">
+        <a class="subrow on" id="sb-users" onclick="navigate('users')">
           <span class="dot" style="background:#1d4ed8">U</span>All Users
         </a>
       </div>
     </div>
     <div class="sitem" id="si-courses">
-      <button class="srow" onclick="tog('si-courses')">
-        <span>📚</span><span>Courses</span><span class="chev">›</span>
+      <button class="srow" id="sr-courses" onclick="togSec('si-courses')">
+        <span>📚</span><span>Courses</span>
+        <span class="bcur" id="bcur-courses" style="margin-left:4px;display:none">Active</span>
+        <span class="chev">›</span>
       </button>
       <div class="subnav">
-        <a class="subrow" href="#"><span class="dot" style="background:#1d4ed8">C</span>All Courses</a>
+        <a class="subrow" id="sb-courses" onclick="navigate('courses')">
+          <span class="dot" style="background:#1d4ed8">C</span>All Courses
+        </a>
       </div>
     </div>
     <div class="sitem" id="si-asgn">
-      <button class="srow" onclick="tog('si-asgn')">
+      <button class="srow" onclick="togSec('si-asgn')">
         <span>📝</span><span>Assignments</span><span class="chev">›</span>
       </button>
       <div class="subnav">
@@ -276,7 +261,7 @@
       </div>
     </div>
     <div class="sitem" id="si-enr">
-      <button class="srow" onclick="tog('si-enr')">
+      <button class="srow" onclick="togSec('si-enr')">
         <span>📊</span><span>Enrollments</span><span class="chev">›</span>
       </button>
       <div class="subnav">
@@ -284,7 +269,7 @@
       </div>
     </div>
     <div class="sitem" id="si-quiz">
-      <button class="srow" onclick="tog('si-quiz')">
+      <button class="srow" onclick="togSec('si-quiz')">
         <span>❓</span><span>Quizzes</span><span class="chev">›</span>
       </button>
       <div class="subnav">
@@ -292,7 +277,7 @@
       </div>
     </div>
     <div class="sitem" id="si-less">
-      <button class="srow" onclick="tog('si-less')">
+      <button class="srow" onclick="togSec('si-less')">
         <span>📖</span><span>Lessons</span><span class="chev">›</span>
       </button>
       <div class="subnav">
@@ -310,142 +295,98 @@
     </div>
   </aside>
 
-  <!-- MAIN -->
+  <!-- MAIN — dynamically rendered -->
   <main>
-    <div class="crumb">
+    <div class="crumb" id="crumbBar">
       <a href="courses-workspace-demo.html">🏠</a>
-      <span class="sep">›</span><a href="#">Admin</a>
-      <span class="sep">›</span><span>User Management</span>
+      <span class="sep">›</span><a onclick="navigate(currentView==='lessons'?'courses':currentView)" style="cursor:pointer">Admin</a>
+      <span class="sep">›</span><span id="crumbEnd">User Management</span>
     </div>
-    <div class="content">
-      <div class="ph">User Management</div>
-      <div class="ps">daytona_lms &nbsp;›&nbsp; dbo.User &nbsp;·&nbsp; Add, edit, and delete LMS accounts</div>
-
-      <div class="stats">
-        <div class="sc"><div class="si si-t">👥</div><div><div class="sv" id="sTot">—</div><div class="sl">Total Users</div></div></div>
-        <div class="sc"><div class="si si-a">🔐</div><div><div class="sv" id="sAdm">—</div><div class="sl">Admins</div></div></div>
-        <div class="sc"><div class="si si-i">🎓</div><div><div class="sv" id="sIns">—</div><div class="sl">Instructors</div></div></div>
-        <div class="sc"><div class="si si-s">📖</div><div><div class="sv" id="sStu">—</div><div class="sl">Students</div></div></div>
-      </div>
-
-      <div class="card">
-        <div class="card-hdr">
-          <div class="card-title">All Users <span class="cnt" id="cntLbl">0</span></div>
-          <div class="toolbar">
-            <div class="sw-wrap">
-              <span class="si-ico">🔍</span>
-              <input id="srch" type="text" placeholder="Search name or email…" oninput="render()" />
-            </div>
-            <select class="flt" id="rFlt" onchange="render()">
-              <option value="">All Roles</option>
-              <option value="ADMIN">Admin</option>
-              <option value="INSTRUCTOR">Instructor</option>
-              <option value="STUDENT">Student</option>
-            </select>
-            <select class="flt" id="sFlt" onchange="render()">
-              <option value="">All Statuses</option>
-              <option value="1">Active</option>
-              <option value="0">Inactive</option>
-            </select>
-            <button class="btn btn-navy" onclick="openAdd()">+ Add User</button>
-          </div>
-        </div>
-        <div class="tw">
-          <table>
-            <thead>
-              <tr>
-                <th>User ID</th><th>Name</th><th>Email</th>
-                <th>Role</th><th>Status</th><th>Created</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="tbody">
-              <tr><td colspan="7"><div class="empty"><div class="ei">⏳</div>Loading users…</div></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div class="content" id="mainContent">
+      <!-- Content injected by JS -->
     </div>
   </main>
 </div>
 
-<!-- ADD/EDIT MODAL -->
+<!-- ═══════════ USER ADD/EDIT MODAL ═══════════ -->
 <div class="ovl" id="uModal">
   <div class="modal">
-    <div class="mhdr">
-      <h2 id="mTitle">Add User</h2>
-      <button class="mcls" onclick="closeMod('uModal')">✕</button>
-    </div>
+    <div class="mhdr"><h2 id="umTitle">Add User</h2><button class="mcls" onclick="closeMod('uModal')">✕</button></div>
     <div class="mbdy">
       <div class="fgrid">
-        <div class="fg">
-          <label>First Name *</label>
-          <input class="fc" id="fFn" type="text" placeholder="Maria" />
-          <span class="ferr" id="eFn"></span>
-        </div>
-        <div class="fg">
-          <label>Last Name *</label>
-          <input class="fc" id="fLn" type="text" placeholder="Rodriguez" />
-          <span class="ferr" id="eLn"></span>
-        </div>
-        <div class="fg full">
-          <label>Email Address *</label>
-          <input class="fc" id="fEm" type="email" placeholder="user@daytona.edu" />
-          <span class="ferr" id="eEm"></span>
-        </div>
+        <div class="fg"><label>First Name *</label><input class="fc" id="fFn" type="text" placeholder="Maria" /><span class="ferr" id="eFn"></span></div>
+        <div class="fg"><label>Last Name *</label><input class="fc" id="fLn" type="text" placeholder="Rodriguez" /><span class="ferr" id="eLn"></span></div>
+        <div class="fg full"><label>Email Address *</label><input class="fc" id="fEm" type="email" placeholder="user@daytona.edu" /><span class="ferr" id="eEm"></span></div>
         <div class="fg full" id="pwGrp">
           <label>Temporary Password *</label>
-          <div class="pwr">
-            <input class="fc" id="fPw" type="text" placeholder="Auto-generate or enter…" />
-            <button type="button" class="btn btn-out" onclick="genPw()">⟳ Generate</button>
-          </div>
-          <p class="fhnt">User will be prompted to reset on first login.</p>
-          <span class="ferr" id="ePw"></span>
+          <div class="pwr"><input class="fc" id="fPw" type="text" placeholder="Auto-generate or enter…" /><button type="button" class="btn btn-out" onclick="genPw()">⟳ Generate</button></div>
+          <p class="fhnt">User will be prompted to reset on first login.</p><span class="ferr" id="ePw"></span>
         </div>
-        <div class="fg">
-          <label>Role *</label>
-          <select class="fc" id="fRl">
-            <option value="">— Select —</option>
-            <option value="STUDENT">Student</option>
-            <option value="INSTRUCTOR">Instructor</option>
-            <option value="ADMIN">Admin</option>
-          </select>
-          <span class="ferr" id="eRl"></span>
-        </div>
-        <div class="fg">
-          <label>Account Status</label>
-          <div class="togrow" style="margin-top:6px">
-            <button type="button" class="tog on" id="fAc" onclick="toggleAc()"></button>
-            <span class="tlbl" id="tlbl">Active</span>
-          </div>
-        </div>
+        <div class="fg"><label>Role *</label><select class="fc" id="fRl"><option value="">— Select —</option><option value="STUDENT">Student</option><option value="INSTRUCTOR">Instructor</option><option value="ADMIN">Admin</option></select><span class="ferr" id="eRl"></span></div>
+        <div class="fg"><label>Account Status</label><div class="togrow" style="margin-top:6px"><button type="button" class="tog on" id="fAc" onclick="toggleAc()"></button><span class="tlbl" id="tlbl">Active</span></div></div>
       </div>
     </div>
-    <div class="mftr">
-      <button class="btn btn-out" onclick="closeMod('uModal')">Cancel</button>
-      <button class="btn btn-navy" id="savBtn" onclick="saveUser()">Save User</button>
-    </div>
+    <div class="mftr"><button class="btn btn-out" onclick="closeMod('uModal')">Cancel</button><button class="btn btn-navy" id="uSavBtn" onclick="saveUser()">Save User</button></div>
   </div>
 </div>
 
-<!-- DELETE MODAL -->
+<!-- ═══════════ COURSE ADD/EDIT MODAL ═══════════ -->
+<div class="ovl" id="cModal">
+  <div class="modal">
+    <div class="mhdr"><h2 id="cmTitle">Add Course</h2><button class="mcls" onclick="closeMod('cModal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fgrid">
+        <div class="fg full"><label>Course Title *</label><input class="fc" id="cfTitle" type="text" placeholder="e.g. Web Systems II" /><span class="ferr" id="ceTitle"></span></div>
+        <div class="fg full"><label>Remarks</label><textarea class="fc" id="cfRemarks" placeholder="Course description or notes…"></textarea></div>
+        <div class="fg"><label>Instructor ID *</label><input class="fc" id="cfInstructor" type="number" placeholder="e.g. 4577" /><span class="ferr" id="ceInstructor"></span></div>
+        <div class="fg"><label>Status</label><select class="fc" id="cfStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option><option value="Draft">Draft</option></select></div>
+        <div class="fg"><label>Published</label><select class="fc" id="cfPublished"><option value="1">Yes</option><option value="0">No</option></select></div>
+      </div>
+    </div>
+    <div class="mftr"><button class="btn btn-out" onclick="closeMod('cModal')">Cancel</button><button class="btn btn-navy" id="cSavBtn" onclick="saveCourse()">Save Course</button></div>
+  </div>
+</div>
+
+<!-- ═══════════ LESSON ADD/EDIT MODAL ═══════════ -->
+<div class="ovl" id="lModal">
+  <div class="modal">
+    <div class="mhdr"><h2 id="lmTitle">Add Lesson</h2><button class="mcls" onclick="closeMod('lModal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fgrid">
+        <div class="fg full"><label>Lesson Title *</label><input class="fc" id="lfTitle" type="text" placeholder="e.g. Introduction to HTML" /><span class="ferr" id="leTitle"></span></div>
+        <div class="fg full"><label>Content</label><textarea class="fc" id="lfContent" placeholder="Lesson content or description…" style="min-height:90px"></textarea></div>
+        <div class="fg"><label>Week Number *</label><input class="fc" id="lfWeek" type="number" min="1" max="16" placeholder="1" /><span class="ferr" id="leWeek"></span></div>
+        <div class="fg"><label>Status</label><select class="fc" id="lfStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option><option value="Draft">Draft</option></select></div>
+      </div>
+    </div>
+    <div class="mftr"><button class="btn btn-out" onclick="closeMod('lModal')">Cancel</button><button class="btn btn-navy" id="lSavBtn" onclick="saveLesson()">Save Lesson</button></div>
+  </div>
+</div>
+
+<!-- ═══════════ MATERIAL ADD MODAL ═══════════ -->
+<div class="ovl" id="mModal">
+  <div class="modal" style="max-width:460px">
+    <div class="mhdr"><h2>Add Material</h2><button class="mcls" onclick="closeMod('mModal')">✕</button></div>
+    <div class="mbdy">
+      <div class="fgrid">
+        <div class="fg full"><label>Title *</label><input class="fc" id="mfTitle" type="text" placeholder="e.g. Lecture Slides" /><span class="ferr" id="meTitle"></span></div>
+        <div class="fg full"><label>Type *</label><select class="fc" id="mfType"><option value="attachment">Attachment (File)</option><option value="link">Link (URL)</option></select></div>
+        <div class="fg full"><label>URL / File Path *</label><input class="fc" id="mfUrl" type="text" placeholder="https://... or filename.pdf" /><span class="ferr" id="meUrl"></span></div>
+      </div>
+    </div>
+    <div class="mftr"><button class="btn btn-out" onclick="closeMod('mModal')">Cancel</button><button class="btn btn-teal" onclick="saveMaterial()">Add Material</button></div>
+  </div>
+</div>
+
+<!-- ═══════════ DELETE CONFIRM MODAL ═══════════ -->
 <div class="ovl" id="dModal">
   <div class="modal" style="max-width:360px">
-    <div class="mhdr">
-      <h2>Confirm Delete</h2>
-      <button class="mcls" onclick="closeMod('dModal')">✕</button>
-    </div>
+    <div class="mhdr"><h2>Confirm Delete</h2><button class="mcls" onclick="closeMod('dModal')">✕</button></div>
     <div class="mbdy" style="padding:24px 20px">
       <div class="dico">🗑️</div>
-      <p class="dmsg">
-        You are about to permanently delete<br/>
-        <span class="dname" id="dName"></span><br/>
-        <span style="color:var(--red);font-weight:600">This action cannot be undone.</span>
-      </p>
+      <p class="dmsg">You are about to permanently delete<br/><span class="dname" id="dName"></span><br/><span style="color:var(--red);font-weight:600">This action cannot be undone.</span></p>
     </div>
-    <div class="mftr">
-      <button class="btn btn-out" onclick="closeMod('dModal')">Cancel</button>
-      <button class="btn btn-red" onclick="confirmDel()">Delete User</button>
-    </div>
+    <div class="mftr"><button class="btn btn-out" onclick="closeMod('dModal')">Cancel</button><button class="btn btn-red" id="dConfBtn" onclick="confirmDel()">Delete</button></div>
   </div>
 </div>
 
@@ -453,19 +394,17 @@
 
 <script>
 /* ══════════════════════════════════════════════
-   AUTH GUARD — runs before anything else
+   AUTH GUARD
 ══════════════════════════════════════════════ */
 (function() {
-  if (sessionStorage.getItem("lms_auth") !== "true") {
-    window.location.replace("login.html");
-  } else {
-    // Reveal page
-    document.getElementById("authGuard").style.display = "none";
-    // Set username display
-    const uname = sessionStorage.getItem("lms_user") || "Admin";
-    document.getElementById("hUserName").textContent = uname;
-    document.getElementById("hAvatar").textContent   = uname.charAt(0).toUpperCase();
+  const isAuth = sessionStorage.getItem("lms_auth") === "true";
+  if (!isAuth) {
+    try { const x = new XMLHttpRequest(); x.open("HEAD","login.html",false); x.send(); if(x.status===200){ window.location.replace("login.html"); return; } } catch(e){}
   }
+  document.getElementById("authGuard").style.display = "none";
+  const uname = sessionStorage.getItem("lms_user") || "Admin";
+  document.getElementById("hUserName").textContent = uname;
+  document.getElementById("hAvatar").textContent   = uname.charAt(0).toUpperCase();
 })();
 
 function logout() {
@@ -475,28 +414,112 @@ function logout() {
 }
 
 /* ══════════════════════════════════════════════
-   CONFIG — swap with your deployed API URL
+   CONFIG
 ══════════════════════════════════════════════ */
 const API = "https://daytona-lms-api.onrender.com/api";
 
-const SEED = [
-  {userId:1,firstName:"Jose",   lastName:"Melendez", email:"jose@test.com",          role:"ADMIN",      isActive:1,createdAt:"2026-02-18T23:33:38"},
-  {userId:2,firstName:"Ronald", lastName:"Eaglin",   email:"instructor@daytona.edu", role:"INSTRUCTOR", isActive:1,createdAt:"2026-02-18T23:45:28"},
-  {userId:3,firstName:"Maria",  lastName:"Rodriguez",email:"student1@daytona.edu",   role:"STUDENT",    isActive:1,createdAt:"2026-02-18T23:45:28"},
-  {userId:4,firstName:"James",  lastName:"Wilson",   email:"student2@daytona.edu",   role:"STUDENT",    isActive:1,createdAt:"2026-02-18T23:45:28"},
+/* ══════════════════════════════════════════════
+   SEED DATA
+══════════════════════════════════════════════ */
+const SEED_USERS = [
+  {userId:1,firstName:"Jose",lastName:"Melendez",email:"jose@test.com",role:"ADMIN",isActive:1,createdAt:"2026-02-18T23:33:38"},
+  {userId:2,firstName:"Ronald",lastName:"Eaglin",email:"instructor@daytona.edu",role:"INSTRUCTOR",isActive:1,createdAt:"2026-02-18T23:45:28"},
+  {userId:3,firstName:"Maria",lastName:"Rodriguez",email:"student1@daytona.edu",role:"STUDENT",isActive:1,createdAt:"2026-02-18T23:45:28"},
+  {userId:4,firstName:"James",lastName:"Wilson",email:"student2@daytona.edu",role:"STUDENT",isActive:1,createdAt:"2026-02-18T23:45:28"},
+];
+const SEED_COURSES = [
+  {courseId:1,CourseTitle:"Web Systems II",Remarks:"Full-stack web development with Node.js, Express, and SQL Server",instructorId:4577,status:"Active",isPublished:true,createdAt:"2026-01-15T10:00:00",EditedDate:"2026-03-20T14:30:00"},
+  {courseId:2,CourseTitle:"Database Design",Remarks:"Relational database design, normalization, and SQL",instructorId:4577,status:"Active",isPublished:true,createdAt:"2026-01-15T10:00:00",EditedDate:"2026-03-18T09:00:00"},
+];
+const SEED_LESSONS = [
+  {LessonId:132,CourseID:1,Title:"Introduction to Node.js",Content:"Setting up the development environment and understanding the event loop.",WeekNumber:1,Status:"Active",CreatedAt:"2026-01-18T08:00:00",UpdatedAt:"2026-03-20T14:30:00"},
+  {LessonId:252,CourseID:1,Title:"Express.js Fundamentals",Content:"Routing, middleware, template engines, and RESTful API patterns with Express.",WeekNumber:2,Status:"Active",CreatedAt:"2026-01-25T08:00:00",UpdatedAt:"2026-03-20T14:30:00"},
+  {LessonId:301,CourseID:1,Title:"SQL Server Integration",Content:"Connecting Node.js to SQL Server using mssql/tedious. Parameterized queries and connection pooling.",WeekNumber:3,Status:"Active",CreatedAt:"2026-02-01T08:00:00",UpdatedAt:"2026-03-19T10:00:00"},
+  {LessonId:410,CourseID:2,Title:"ER Modeling",Content:"Entity-relationship diagrams, cardinality, and translating requirements into schemas.",WeekNumber:1,Status:"Active",CreatedAt:"2026-01-18T08:00:00",UpdatedAt:"2026-03-18T09:00:00"},
+];
+const SEED_MATERIALS = [
+  {MaterialId:1,CourseID:1,LessonId:132,Title:"Node.js Setup Guide",MaterialType:"attachment",URL:"nodejs-setup.pdf"},
+  {MaterialId:2,CourseID:1,LessonId:132,Title:"Official Node.js Docs",MaterialType:"link",URL:"https://nodejs.org/en/docs/"},
+  {MaterialId:3,CourseID:1,LessonId:132,Title:"Lecture Recording Week 1",MaterialType:"link",URL:"https://stream.example.com/week1"},
+  {MaterialId:4,CourseID:1,LessonId:252,Title:"Express Cheat Sheet",MaterialType:"attachment",URL:"express-cheatsheet.pdf"},
+  {MaterialId:5,CourseID:1,LessonId:252,Title:"REST API Design Guide",MaterialType:"link",URL:"https://restfulapi.net/"},
 ];
 
-let users=[], demo=false, editId=null, delId=null, isAc=true;
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+let users=[], courses=[], lessons=[], materials=[];
+let demo=false;
+let currentView="users"; // "users" | "courses" | "lessons"
+let currentCourseId=null;
+// user editing
+let uEditId=null, isAc=true;
+// course editing
+let cEditId=null;
+// lesson editing
+let lEditId=null;
+// delete
+let delTarget=null;
+// material add target
+let matTarget=null;
 
-/* sidebar toggle */
-function tog(id){
+/* ══════════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════════ */
+const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function fmt(d){try{return new Date(d).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});}catch(_){return d||"—";}}
+function toast(m,t="ok"){const el=document.createElement("div");el.className=`toast ${t==="ok"?"tok":"terr"}`;el.textContent=m;document.getElementById("toasts").appendChild(el);setTimeout(()=>el.remove(),3200);}
+function closeMod(id){document.getElementById(id).classList.remove("open");}
+function statusBadge(s){const c=(s||"").trim().toLowerCase();if(c==="active")return`<span class="badge bActive">Active</span>`;if(c==="inactive")return`<span class="badge bInactive">Inactive</span>`;return`<span class="badge bDraft">${esc(s||"Draft")}</span>`;}
+
+/* ══════════════════════════════════════════════
+   SIDEBAR — section toggle + navigation
+══════════════════════════════════════════════ */
+function togSec(id){
   const el=document.getElementById(id);
   el.classList.toggle('open');
-  const sub=el.querySelector('.subnav');
-  if(sub) sub.classList.toggle('open');
+  el.querySelector('.subnav')?.classList.toggle('open');
 }
 
-/* api */
+function navigate(view){
+  currentView=view;
+  // update sidebar active states
+  document.querySelectorAll('.srow').forEach(s=>{s.classList.remove('on');});
+  document.querySelectorAll('.subrow').forEach(s=>{s.classList.remove('on');});
+  document.getElementById('bcur-users').style.display='none';
+  document.getElementById('bcur-courses').style.display='none';
+
+  if(view==='users'){
+    document.getElementById('sr-users').classList.add('on');
+    document.getElementById('sb-users').classList.add('on');
+    document.getElementById('bcur-users').style.display='';
+    // expand users, collapse courses
+    document.getElementById('si-users').classList.add('open');
+    document.getElementById('si-users').querySelector('.subnav').classList.add('open');
+    document.getElementById('si-courses').classList.remove('open');
+    document.getElementById('si-courses').querySelector('.subnav').classList.remove('open');
+    renderUsers();
+  } else if(view==='courses'){
+    currentCourseId=null;
+    document.getElementById('sr-courses').classList.add('on');
+    document.getElementById('sb-courses').classList.add('on');
+    document.getElementById('bcur-courses').style.display='';
+    document.getElementById('si-courses').classList.add('open');
+    document.getElementById('si-courses').querySelector('.subnav').classList.add('open');
+    document.getElementById('si-users').classList.remove('open');
+    document.getElementById('si-users').querySelector('.subnav').classList.remove('open');
+    renderCourses();
+  } else if(view==='lessons'){
+    document.getElementById('sr-courses').classList.add('on');
+    document.getElementById('sb-courses').classList.add('on');
+    document.getElementById('bcur-courses').style.display='';
+    renderLessons();
+  }
+}
+
+/* ══════════════════════════════════════════════
+   API
+══════════════════════════════════════════════ */
 async function req(path,method="GET",body=null){
   const o={method,headers:{"Content-Type":"application/json"}};
   if(body) o.body=JSON.stringify(body);
@@ -505,160 +528,338 @@ async function req(path,method="GET",body=null){
   return r.json();
 }
 
-async function load(){
-  try{ users=await req("/users"); demo=false; }
-  catch(err){
-    console.warn("⚠️ API unreachable, using demo data.", err.message);
-    users=JSON.parse(JSON.stringify(SEED)); demo=true;
+async function loadAll(){
+  try{
+    users=await req("/users");
+    demo=false;
+  }catch(err){
+    console.warn("⚠️ API unreachable, using demo data.",err.message);
+    users=JSON.parse(JSON.stringify(SEED_USERS));
+    courses=JSON.parse(JSON.stringify(SEED_COURSES));
+    lessons=JSON.parse(JSON.stringify(SEED_LESSONS));
+    materials=JSON.parse(JSON.stringify(SEED_MATERIALS));
+    demo=true;
     toast("⚠️ Using demo data — API offline","err");
   }
-  stats(); render();
+  if(!demo){
+    try{courses=await req("/courses");}catch(_){courses=JSON.parse(JSON.stringify(SEED_COURSES));}
+  }
+  navigate('users');
 }
 
-function stats(){
-  document.getElementById("sTot").textContent=users.length;
-  document.getElementById("sAdm").textContent=users.filter(u=>u.role==="ADMIN").length;
-  document.getElementById("sIns").textContent=users.filter(u=>u.role==="INSTRUCTOR").length;
-  document.getElementById("sStu").textContent=users.filter(u=>u.role==="STUDENT").length;
+/* ══════════════════════════════════════════════
+   USERS VIEW
+══════════════════════════════════════════════ */
+function renderUsers(){
+  document.getElementById("crumbEnd").innerHTML="User Management";
+  const mc=document.getElementById("mainContent");
+  const tot=users.length, adm=users.filter(u=>u.role==="ADMIN").length,
+        ins=users.filter(u=>u.role==="INSTRUCTOR").length, stu=users.filter(u=>u.role==="STUDENT").length;
+
+  mc.innerHTML=`
+    <div class="ph">User Management</div>
+    <div class="ps">daytona_lms &nbsp;›&nbsp; dbo.User &nbsp;·&nbsp; Add, edit, and delete LMS accounts</div>
+    <div class="stats">
+      <div class="sc"><div class="si si-t">👥</div><div><div class="sv">${tot}</div><div class="sl">Total Users</div></div></div>
+      <div class="sc"><div class="si si-a">🔐</div><div><div class="sv">${adm}</div><div class="sl">Admins</div></div></div>
+      <div class="sc"><div class="si si-i">🎓</div><div><div class="sv">${ins}</div><div class="sl">Instructors</div></div></div>
+      <div class="sc"><div class="si si-s">📖</div><div><div class="sv">${stu}</div><div class="sl">Students</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title">All Users <span class="cnt" id="uCnt">${tot}</span></div>
+        <div class="toolbar">
+          <div class="sw-wrap"><span class="si-ico">🔍</span><input id="uSrch" type="text" placeholder="Search name or email…" oninput="filterUsers()" /></div>
+          <select class="flt" id="uRFlt" onchange="filterUsers()"><option value="">All Roles</option><option value="ADMIN">Admin</option><option value="INSTRUCTOR">Instructor</option><option value="STUDENT">Student</option></select>
+          <select class="flt" id="uSFlt" onchange="filterUsers()"><option value="">All Statuses</option><option value="1">Active</option><option value="0">Inactive</option></select>
+          <button class="btn btn-navy" onclick="openAddUser()">+ Add User</button>
+        </div>
+      </div>
+      <div class="tw"><table><thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody id="uTbody"></tbody></table></div>
+    </div>`;
+  filterUsers();
 }
 
-function render(){
-  const q=document.getElementById("srch").value.toLowerCase();
-  const r=document.getElementById("rFlt").value;
-  const s=document.getElementById("sFlt").value;
+function filterUsers(){
+  const q=(document.getElementById("uSrch")?.value||"").toLowerCase();
+  const r=document.getElementById("uRFlt")?.value||"";
+  const s=document.getElementById("uSFlt")?.value||"";
   const f=users.filter(u=>{
     const n=`${u.firstName} ${u.lastName} ${u.email}`.toLowerCase();
     return(!q||n.includes(q))&&(!r||u.role===r)&&(s===""||String(u.isActive)===s);
   });
-  document.getElementById("cntLbl").textContent=f.length;
-  const tb=document.getElementById("tbody");
+  document.getElementById("uCnt").textContent=f.length;
+  const tb=document.getElementById("uTbody");
   if(!f.length){tb.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="ei">🔍</div>No users found.</div></td></tr>`;return;}
-  tb.innerHTML=f.map(u=>`
-    <tr>
-      <td class="idc">#${u.userId}</td>
-      <td><strong>${esc(u.firstName)} ${esc(u.lastName)}</strong></td>
-      <td style="font-size:12.5px">${esc(u.email)}</td>
-      <td><span class="badge b${u.role}">${u.role}</span></td>
-      <td><span class="sp-pill${u.isActive?'':' off'}">${u.isActive?'Active':'Inactive'}</span></td>
-      <td style="font-size:12px;color:var(--text-sm)">${fmt(u.createdAt)}</td>
-      <td><div class="acts">
-        <button class="btn btn-out btn-sm" onclick="openEdit(${u.userId})">✏️ Edit</button>
-        <button class="btn btn-red btn-sm" onclick="openDel(${u.userId})">🗑️</button>
-      </div></td>
-    </tr>
-  `).join("");
+  tb.innerHTML=f.map(u=>`<tr>
+    <td class="idc">#${u.userId}</td>
+    <td><strong>${esc(u.firstName)} ${esc(u.lastName)}</strong></td>
+    <td style="font-size:12.5px">${esc(u.email)}</td>
+    <td><span class="badge b${u.role}">${u.role}</span></td>
+    <td><span class="sp-pill${u.isActive?'':' off'}">${u.isActive?'Active':'Inactive'}</span></td>
+    <td style="font-size:12px;color:var(--text-sm)">${fmt(u.createdAt)}</td>
+    <td><div class="acts"><button class="btn btn-out btn-sm" onclick="openEditUser(${u.userId})">✏️ Edit</button><button class="btn btn-red btn-sm" onclick="openDelUser(${u.userId})">🗑️</button></div></td>
+  </tr>`).join("");
 }
 
-const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-function fmt(d){try{return new Date(d).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});}catch(_){return d||"—";}}
+/* ══════════════════════════════════════════════
+   COURSES VIEW
+══════════════════════════════════════════════ */
+function renderCourses(){
+  document.getElementById("crumbEnd").innerHTML="Courses";
+  const mc=document.getElementById("mainContent");
+  const act=courses.filter(c=>(c.status||"").trim().toLowerCase()==="active").length;
+  const inact=courses.filter(c=>(c.status||"").trim().toLowerCase()==="inactive").length;
+  const drf=courses.filter(c=>(c.status||"").trim().toLowerCase()==="draft").length;
 
-function toast(m,t="ok"){
-  const el=document.createElement("div");
-  el.className=`toast ${t==="ok"?"tok":"terr"}`;el.textContent=m;
-  document.getElementById("toasts").appendChild(el);
-  setTimeout(()=>el.remove(),3200);
+  mc.innerHTML=`
+    <div class="ph">Courses</div>
+    <div class="ps">daytona_lms &nbsp;›&nbsp; dbo.Course &nbsp;·&nbsp; Manage courses and their lessons</div>
+    <div class="stats">
+      <div class="sc"><div class="si si-t">📚</div><div><div class="sv">${courses.length}</div><div class="sl">Total Courses</div></div></div>
+      <div class="sc"><div class="si si-i">✅</div><div><div class="sv">${act}</div><div class="sl">Active</div></div></div>
+      <div class="sc"><div class="si si-a">📴</div><div><div class="sv">${inact}</div><div class="sl">Inactive</div></div></div>
+      <div class="sc"><div class="si si-s">📝</div><div><div class="sv">${drf}</div><div class="sl">Draft</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title">All Courses <span class="cnt" id="cCnt">${courses.length}</span></div>
+        <div class="toolbar">
+          <div class="sw-wrap"><span class="si-ico">🔍</span><input id="cSrch" type="text" placeholder="Search courses…" oninput="filterCourses()" /></div>
+          <select class="flt" id="cSFlt" onchange="filterCourses()"><option value="">All Statuses</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="draft">Draft</option></select>
+          <button class="btn btn-navy" onclick="openAddCourse()">+ Add Course</button>
+        </div>
+      </div>
+      <div class="tw"><table><thead><tr><th>Course ID</th><th>Course Title</th><th>Remarks</th><th>Instructor</th><th>Status</th><th>Created</th><th>Edited</th><th>Actions</th></tr></thead><tbody id="cTbody"></tbody></table></div>
+    </div>`;
+  filterCourses();
 }
-function genPw(){
-  const c="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$";
-  let p="";for(let i=0;i<12;i++)p+=c[Math.floor(Math.random()*c.length)];
-  document.getElementById("fPw").value=p;
+
+function filterCourses(){
+  const q=(document.getElementById("cSrch")?.value||"").toLowerCase();
+  const sf=document.getElementById("cSFlt")?.value||"";
+  const f=courses.filter(c=>{
+    const t=`${c.CourseTitle} ${c.Remarks} ${c.courseId}`.toLowerCase();
+    return(!q||t.includes(q))&&(!sf||(c.status||"").trim().toLowerCase()===sf);
+  });
+  document.getElementById("cCnt").textContent=f.length;
+  const tb=document.getElementById("cTbody");
+  if(!f.length){tb.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="ei">🔍</div>No courses found.</div></td></tr>`;return;}
+  tb.innerHTML=f.map(c=>`<tr>
+    <td class="idc">#${esc(String(c.courseId))}</td>
+    <td><a class="link-title" onclick="viewLessons(${c.courseId})">${esc(c.CourseTitle)}</a></td>
+    <td style="max-width:260px;font-size:12.5px;color:var(--text-sm)">${esc(c.Remarks)}</td>
+    <td style="font-size:12.5px">${c.instructorId}</td>
+    <td>${statusBadge(c.status)}</td>
+    <td style="font-size:12px;color:var(--text-sm)">${fmt(c.createdAt)}</td>
+    <td style="font-size:12px;color:var(--text-sm)">${fmt(c.EditedDate)}</td>
+    <td><div class="acts"><button class="btn btn-out btn-sm" onclick="openEditCourse(${c.courseId})">✏️ Edit</button><button class="btn btn-red btn-sm" onclick="openDelCourse(${c.courseId})">🗑️</button></div></td>
+  </tr>`).join("");
 }
-function toggleAc(){
-  isAc=!isAc;
-  document.getElementById("fAc").classList.toggle("on",isAc);
-  document.getElementById("tlbl").textContent=isAc?"Active":"Inactive";
+
+/* ══════════════════════════════════════════════
+   LESSONS VIEW (drilldown from course)
+══════════════════════════════════════════════ */
+function viewLessons(courseId){
+  currentView="lessons"; currentCourseId=courseId;
+  if(demo){ renderLessons(); return; }
+  req(`/courses/${courseId}/lessons`).then(d=>{lessons=d;return req(`/courses/${courseId}/materials`);})
+    .then(d=>{materials=d;renderLessons();})
+    .catch(()=>renderLessons());
 }
-function closeMod(id){document.getElementById(id).classList.remove("open");}
-function clrForm(){
-  ["fFn","fLn","fEm","fPw","fRl"].forEach(f=>document.getElementById(f).value="");
-  ["eFn","eLn","eEm","ePw","eRl"].forEach(f=>document.getElementById(f).textContent="");
-  ["fFn","fLn","fEm","fPw","fRl"].forEach(f=>document.getElementById(f).classList.remove("err"));
-  isAc=true;
-  document.getElementById("fAc").classList.add("on");
-  document.getElementById("tlbl").textContent="Active";
+
+function renderLessons(){
+  const c=courses.find(x=>x.courseId===currentCourseId);
+  const cName=c?c.CourseTitle:`Course #${currentCourseId}`;
+  document.getElementById("crumbEnd").innerHTML=`<a onclick="navigate('courses')" style="cursor:pointer;color:var(--text-sm)">Courses</a> <span class="sep">›</span> Lessons for ${esc(cName)}`;
+  const cls=lessons.filter(l=>l.CourseID===currentCourseId);
+  const mc=document.getElementById("mainContent");
+  mc.innerHTML=`
+    <button class="btn-back" onclick="navigate('courses')">← Back to Courses</button>
+    <div class="ph">Lessons for ${esc(cName)}</div>
+    <div class="ps">daytona_lms &nbsp;›&nbsp; dbo.Course_Lessons &nbsp;·&nbsp; Manage lessons and additional materials</div>
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title">Lessons <span class="cnt" id="lCnt">${cls.length}</span></div>
+        <div class="toolbar">
+          <div class="sw-wrap"><span class="si-ico">🔍</span><input id="lSrch" type="text" placeholder="Search lessons…" oninput="filterLessons()" /></div>
+          <button class="btn btn-navy" onclick="openAddLesson()">+ Add Lesson</button>
+        </div>
+      </div>
+      <div class="tw"><table><thead><tr><th>Lesson ID</th><th>Lesson Title</th><th>Content</th><th>Week #</th><th>Status</th><th>Created</th><th>Edited</th><th>Actions</th></tr></thead><tbody id="lTbody"></tbody></table></div>
+    </div>`;
+  filterLessons();
 }
-function validate(){
+
+function filterLessons(){
+  const q=(document.getElementById("lSrch")?.value||"").toLowerCase();
+  const cls=lessons.filter(l=>l.CourseID===currentCourseId);
+  const f=cls.filter(l=>{const t=`${l.Title} ${l.Content} ${l.LessonId}`.toLowerCase();return!q||t.includes(q);});
+  document.getElementById("lCnt").textContent=f.length;
+  const tb=document.getElementById("lTbody");
+  if(!f.length){tb.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="ei">📖</div>No lessons yet. Add the first one!</div></td></tr>`;return;}
+  tb.innerHTML=f.map(l=>{
+    const lm=materials.filter(m=>m.CourseID===currentCourseId&&m.LessonId===l.LessonId);
+    return`<tr>
+      <td class="idc">#${l.LessonId}</td>
+      <td><strong>${esc(l.Title)}</strong></td>
+      <td style="max-width:320px;font-size:12.5px">${esc(l.Content)}
+        <div class="mat-list"><div class="mat-label">Additional Material:</div>
+          ${lm.length?lm.map(m=>`<div class="mat-item"><span>${m.MaterialType==="attachment"?"📎":"🔗"}</span><a href="${esc(m.URL)}" target="_blank">${esc(m.Title)}</a> <span style="font-size:11px;color:var(--text-sm)">(${m.MaterialType})</span><button class="mat-del" onclick="openDelMaterial(${m.MaterialId},'${esc(m.Title).replace(/'/g,"\\'")}')">✕</button></div>`).join(""):`<div class="mat-item" style="color:var(--text-sm);font-style:italic">No materials added yet.</div>`}
+          <button class="btn-add-mat" onclick="openAddMaterial(${currentCourseId},${l.LessonId})">+ Add material</button>
+        </div>
+      </td>
+      <td style="text-align:center;font-weight:600">${l.WeekNumber||"—"}</td>
+      <td>${statusBadge(l.Status)}</td>
+      <td style="font-size:12px;color:var(--text-sm)">${fmt(l.CreatedAt)}</td>
+      <td style="font-size:12px;color:var(--text-sm)">${fmt(l.UpdatedAt)}</td>
+      <td><div class="acts"><button class="btn btn-out btn-sm" onclick="openEditLesson(${l.LessonId})">✏️ Edit</button><button class="btn btn-red btn-sm" onclick="openDelLesson(${l.LessonId},'${esc(l.Title).replace(/'/g,"\\'")}')">🗑️</button></div></td>
+    </tr>`;
+  }).join("");
+}
+
+/* ══════════════════════════════════════════════
+   USER CRUD
+══════════════════════════════════════════════ */
+function genPw(){const c="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$";let p="";for(let i=0;i<12;i++)p+=c[Math.floor(Math.random()*c.length)];document.getElementById("fPw").value=p;}
+function toggleAc(){isAc=!isAc;document.getElementById("fAc").classList.toggle("on",isAc);document.getElementById("tlbl").textContent=isAc?"Active":"Inactive";}
+function clrUserForm(){["fFn","fLn","fEm","fPw","fRl"].forEach(f=>document.getElementById(f).value="");["eFn","eLn","eEm","ePw","eRl"].forEach(f=>document.getElementById(f).textContent="");["fFn","fLn","fEm","fPw","fRl"].forEach(f=>document.getElementById(f).classList.remove("err"));isAc=true;document.getElementById("fAc").classList.add("on");document.getElementById("tlbl").textContent="Active";}
+function validateUser(){
   let ok=true;
   const fields=[["fFn","eFn","First name"],["fLn","eLn","Last name"],["fEm","eEm","Email"],["fRl","eRl","Role"]];
-  if(!editId) fields.push(["fPw","ePw","Password"]);
-  fields.forEach(([fi,ei,lbl])=>{
-    const v=document.getElementById(fi).value.trim();
-    const e=document.getElementById(ei);
-    if(!v){if(e)e.textContent=lbl+" is required.";document.getElementById(fi).classList.add("err");ok=false;}
-    else{if(e)e.textContent="";document.getElementById(fi).classList.remove("err");}
-  });
+  if(!uEditId) fields.push(["fPw","ePw","Password"]);
+  fields.forEach(([fi,ei,lbl])=>{const v=document.getElementById(fi).value.trim();const e=document.getElementById(ei);if(!v){if(e)e.textContent=lbl+" is required.";document.getElementById(fi).classList.add("err");ok=false;}else{if(e)e.textContent="";document.getElementById(fi).classList.remove("err");}});
   const em=document.getElementById("fEm").value.trim();
-  if(em&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){
-    document.getElementById("eEm").textContent="Invalid email.";
-    document.getElementById("fEm").classList.add("err");ok=false;
-  }
+  if(em&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){document.getElementById("eEm").textContent="Invalid email.";document.getElementById("fEm").classList.add("err");ok=false;}
   return ok;
 }
-function openAdd(){
-  editId=null;clrForm();
-  document.getElementById("mTitle").textContent="Add User";
-  document.getElementById("pwGrp").style.display="block";
-  document.getElementById("savBtn").textContent="Save User";
-  document.getElementById("uModal").classList.add("open");
-  genPw();
-}
-function openEdit(id){
-  const u=users.find(x=>x.userId===id);if(!u)return;
-  editId=id;clrForm();
-  document.getElementById("fFn").value=u.firstName||"";
-  document.getElementById("fLn").value=u.lastName||"";
-  document.getElementById("fEm").value=u.email||"";
-  document.getElementById("fRl").value=u.role||"";
-  isAc=!!u.isActive;
-  document.getElementById("fAc").classList.toggle("on",isAc);
-  document.getElementById("tlbl").textContent=isAc?"Active":"Inactive";
-  document.getElementById("pwGrp").style.display="none";
-  document.getElementById("mTitle").textContent="Edit User";
-  document.getElementById("savBtn").textContent="Update User";
-  document.getElementById("uModal").classList.add("open");
+function openAddUser(){uEditId=null;clrUserForm();document.getElementById("umTitle").textContent="Add User";document.getElementById("pwGrp").style.display="block";document.getElementById("uSavBtn").textContent="Save User";document.getElementById("uModal").classList.add("open");genPw();}
+function openEditUser(id){
+  const u=users.find(x=>x.userId===id);if(!u)return;uEditId=id;clrUserForm();
+  document.getElementById("fFn").value=u.firstName||"";document.getElementById("fLn").value=u.lastName||"";
+  document.getElementById("fEm").value=u.email||"";document.getElementById("fRl").value=u.role||"";
+  isAc=!!u.isActive;document.getElementById("fAc").classList.toggle("on",isAc);document.getElementById("tlbl").textContent=isAc?"Active":"Inactive";
+  document.getElementById("pwGrp").style.display="none";document.getElementById("umTitle").textContent="Edit User";document.getElementById("uSavBtn").textContent="Update User";document.getElementById("uModal").classList.add("open");
 }
 async function saveUser(){
-  if(!validate())return;
-  const body={
-    firstName:document.getElementById("fFn").value.trim(),
-    lastName:document.getElementById("fLn").value.trim(),
-    email:document.getElementById("fEm").value.trim(),
-    role:document.getElementById("fRl").value,
-    isActive:isAc?1:0,
-  };
-  if(!editId) body.password=document.getElementById("fPw").value.trim();
+  if(!validateUser())return;
+  const body={firstName:document.getElementById("fFn").value.trim(),lastName:document.getElementById("fLn").value.trim(),email:document.getElementById("fEm").value.trim(),role:document.getElementById("fRl").value,isActive:isAc?1:0};
+  if(!uEditId) body.password=document.getElementById("fPw").value.trim();
   try{
-    if(!editId){
-      if(demo){body.userId=users.length?Math.max(...users.map(u=>u.userId))+1:1;body.createdAt=new Date().toISOString();users.push(body);}
-      else{users.push(await req("/users","POST",body));}
-      toast("✅ User created successfully!");
-    } else {
-      if(demo){const i=users.findIndex(u=>u.userId===editId);if(i>-1)users[i]={...users[i],...body};}
-      else{const u=await req(`/users/${editId}`,"PUT",body);const i=users.findIndex(x=>x.userId===editId);if(i>-1)users[i]=u;}
-      toast("✏️ User updated!");
-    }
-    closeMod("uModal");stats();render();
+    if(!uEditId){if(demo){body.userId=users.length?Math.max(...users.map(u=>u.userId))+1:1;body.createdAt=new Date().toISOString();users.push(body);}else{users.push(await req("/users","POST",body));}toast("✅ User created!");}
+    else{if(demo){const i=users.findIndex(u=>u.userId===uEditId);if(i>-1)users[i]={...users[i],...body};}else{const u=await req(`/users/${uEditId}`,"PUT",body);const i=users.findIndex(x=>x.userId===uEditId);if(i>-1)users[i]=u;}toast("✏️ User updated!");}
+    closeMod("uModal");renderUsers();
   }catch(e){toast("❌ "+e.message,"err");}
 }
-function openDel(id){
-  delId=id;
-  const u=users.find(x=>x.userId===id);
-  document.getElementById("dName").textContent=u?`${u.firstName} ${u.lastName} (${u.email})`:`User #${id}`;
-  document.getElementById("dModal").classList.add("open");
-}
-async function confirmDel(){
-  try{
-    if(!demo) await req(`/users/${delId}`,"DELETE");
-    users=users.filter(u=>u.userId!==delId);
-    toast("🗑️ User deleted.");
-    closeMod("dModal");stats();render();
-  }catch(e){toast("❌ "+e.message,"err");}
-}
-document.querySelectorAll(".ovl").forEach(o=>{
-  o.addEventListener("click",ev=>{if(ev.target===o)o.classList.remove("open");});
-});
+function openDelUser(id){const u=users.find(x=>x.userId===id);delTarget={type:"user",id,label:u?`${u.firstName} ${u.lastName} (${u.email})`:`User #${id}`};document.getElementById("dName").textContent=delTarget.label;document.getElementById("dModal").classList.add("open");}
 
-load();
+/* ══════════════════════════════════════════════
+   COURSE CRUD
+══════════════════════════════════════════════ */
+function openAddCourse(){cEditId=null;["cfTitle","cfRemarks","cfInstructor"].forEach(f=>document.getElementById(f).value="");document.getElementById("cfStatus").value="Active";document.getElementById("cfPublished").value="1";["ceTitle","ceInstructor"].forEach(f=>document.getElementById(f).textContent="");document.getElementById("cmTitle").textContent="Add Course";document.getElementById("cSavBtn").textContent="Save Course";document.getElementById("cModal").classList.add("open");}
+function openEditCourse(id){
+  const c=courses.find(x=>x.courseId===id);if(!c)return;cEditId=id;
+  document.getElementById("cfTitle").value=c.CourseTitle||"";document.getElementById("cfRemarks").value=c.Remarks||"";
+  document.getElementById("cfInstructor").value=c.instructorId||"";document.getElementById("cfStatus").value=(c.status||"Active").trim();
+  document.getElementById("cfPublished").value=c.isPublished?"1":"0";["ceTitle","ceInstructor"].forEach(f=>document.getElementById(f).textContent="");
+  document.getElementById("cmTitle").textContent="Edit Course";document.getElementById("cSavBtn").textContent="Update Course";document.getElementById("cModal").classList.add("open");
+}
+async function saveCourse(){
+  let ok=true;const t=document.getElementById("cfTitle").value.trim(),ins=document.getElementById("cfInstructor").value.trim();
+  if(!t){document.getElementById("ceTitle").textContent="Title is required.";ok=false;}else document.getElementById("ceTitle").textContent="";
+  if(!ins){document.getElementById("ceInstructor").textContent="Instructor ID is required.";ok=false;}else document.getElementById("ceInstructor").textContent="";
+  if(!ok)return;
+  const body={CourseTitle:t,Remarks:document.getElementById("cfRemarks").value.trim(),instructorId:parseInt(ins),status:document.getElementById("cfStatus").value,isPublished:document.getElementById("cfPublished").value==="1"};
+  try{
+    if(!cEditId){body.EditedDate=new Date().toISOString();if(demo){body.courseId=courses.length?Math.max(...courses.map(c=>c.courseId))+1:1;body.createdAt=new Date().toISOString();courses.push(body);}else{courses.push(await req("/courses","POST",body));}toast("✅ Course created!");}
+    else{body.EditedDate=new Date().toISOString();if(demo){const i=courses.findIndex(c=>c.courseId===cEditId);if(i>-1)courses[i]={...courses[i],...body};}else{const u=await req(`/courses/${cEditId}`,"PUT",body);const i=courses.findIndex(c=>c.courseId===cEditId);if(i>-1)courses[i]=u;}toast("✏️ Course updated!");}
+    closeMod("cModal");renderCourses();
+  }catch(e){toast("❌ "+e.message,"err");}
+}
+function openDelCourse(id){const c=courses.find(x=>x.courseId===id);delTarget={type:"course",id,label:c?c.CourseTitle:`Course #${id}`};document.getElementById("dName").textContent=delTarget.label;document.getElementById("dModal").classList.add("open");}
+
+/* ══════════════════════════════════════════════
+   LESSON CRUD
+══════════════════════════════════════════════ */
+function openAddLesson(){lEditId=null;["lfTitle","lfContent","lfWeek"].forEach(f=>document.getElementById(f).value="");document.getElementById("lfStatus").value="Active";["leTitle","leWeek"].forEach(f=>document.getElementById(f).textContent="");document.getElementById("lmTitle").textContent="Add Lesson";document.getElementById("lSavBtn").textContent="Save Lesson";document.getElementById("lModal").classList.add("open");}
+function openEditLesson(id){
+  const l=lessons.find(x=>x.LessonId===id);if(!l)return;lEditId=id;
+  document.getElementById("lfTitle").value=l.Title||"";document.getElementById("lfContent").value=l.Content||"";
+  document.getElementById("lfWeek").value=l.WeekNumber||"";document.getElementById("lfStatus").value=(l.Status||"Active").trim();
+  ["leTitle","leWeek"].forEach(f=>document.getElementById(f).textContent="");
+  document.getElementById("lmTitle").textContent="Edit Lesson";document.getElementById("lSavBtn").textContent="Update Lesson";document.getElementById("lModal").classList.add("open");
+}
+async function saveLesson(){
+  let ok=true;const t=document.getElementById("lfTitle").value.trim(),w=document.getElementById("lfWeek").value.trim();
+  if(!t){document.getElementById("leTitle").textContent="Title is required.";ok=false;}else document.getElementById("leTitle").textContent="";
+  if(!w){document.getElementById("leWeek").textContent="Week number is required.";ok=false;}else document.getElementById("leWeek").textContent="";
+  if(!ok)return;
+  const body={CourseID:currentCourseId,Title:t,Content:document.getElementById("lfContent").value.trim(),WeekNumber:parseInt(w),Status:document.getElementById("lfStatus").value};
+  try{
+    if(!lEditId){if(demo){body.LessonId=lessons.length?Math.max(...lessons.map(l=>l.LessonId))+1:1;body.CreatedAt=new Date().toISOString();body.UpdatedAt=new Date().toISOString();lessons.push(body);}else{lessons.push(await req(`/courses/${currentCourseId}/lessons`,"POST",body));}toast("✅ Lesson created!");}
+    else{body.UpdatedAt=new Date().toISOString();if(demo){const i=lessons.findIndex(l=>l.LessonId===lEditId);if(i>-1)lessons[i]={...lessons[i],...body};}else{const u=await req(`/courses/${currentCourseId}/lessons/${lEditId}`,"PUT",body);const i=lessons.findIndex(l=>l.LessonId===lEditId);if(i>-1)lessons[i]=u;}toast("✏️ Lesson updated!");}
+    closeMod("lModal");renderLessons();
+  }catch(e){toast("❌ "+e.message,"err");}
+}
+function openDelLesson(id,title){delTarget={type:"lesson",id,label:title};document.getElementById("dName").textContent=title;document.getElementById("dModal").classList.add("open");}
+
+/* ══════════════════════════════════════════════
+   MATERIAL CRUD
+══════════════════════════════════════════════ */
+function openAddMaterial(cid,lid){matTarget={courseId:cid,lessonId:lid};["mfTitle","mfUrl"].forEach(f=>document.getElementById(f).value="");document.getElementById("mfType").value="attachment";["meTitle","meUrl"].forEach(f=>document.getElementById(f).textContent="");document.getElementById("mModal").classList.add("open");}
+async function saveMaterial(){
+  let ok=true;const t=document.getElementById("mfTitle").value.trim(),u=document.getElementById("mfUrl").value.trim();
+  if(!t){document.getElementById("meTitle").textContent="Title is required.";ok=false;}else document.getElementById("meTitle").textContent="";
+  if(!u){document.getElementById("meUrl").textContent="URL/path is required.";ok=false;}else document.getElementById("meUrl").textContent="";
+  if(!ok)return;
+  const body={CourseID:matTarget.courseId,LessonId:matTarget.lessonId,Title:t,MaterialType:document.getElementById("mfType").value,URL:u};
+  try{
+    if(demo){body.MaterialId=materials.length?Math.max(...materials.map(m=>m.MaterialId))+1:1;materials.push(body);}
+    else{materials.push(await req(`/courses/${matTarget.courseId}/lessons/${matTarget.lessonId}/materials`,"POST",body));}
+    toast("✅ Material added!");closeMod("mModal");renderLessons();
+  }catch(e){toast("❌ "+e.message,"err");}
+}
+function openDelMaterial(id,title){delTarget={type:"material",id,label:title};document.getElementById("dName").textContent=title;document.getElementById("dModal").classList.add("open");}
+
+/* ══════════════════════════════════════════════
+   UNIFIED DELETE
+══════════════════════════════════════════════ */
+async function confirmDel(){
+  if(!delTarget)return;
+  try{
+    if(delTarget.type==="user"){
+      if(!demo) await req(`/users/${delTarget.id}`,"DELETE");
+      users=users.filter(u=>u.userId!==delTarget.id);
+      toast("🗑️ User deleted.");closeMod("dModal");renderUsers();
+    }else if(delTarget.type==="course"){
+      if(!demo) await req(`/courses/${delTarget.id}`,"DELETE");
+      courses=courses.filter(c=>c.courseId!==delTarget.id);
+      lessons=lessons.filter(l=>l.CourseID!==delTarget.id);
+      materials=materials.filter(m=>m.CourseID!==delTarget.id);
+      toast("🗑️ Course deleted.");closeMod("dModal");renderCourses();
+    }else if(delTarget.type==="lesson"){
+      if(!demo) await req(`/courses/${currentCourseId}/lessons/${delTarget.id}`,"DELETE");
+      lessons=lessons.filter(l=>l.LessonId!==delTarget.id);
+      materials=materials.filter(m=>!(m.LessonId===delTarget.id&&m.CourseID===currentCourseId));
+      toast("🗑️ Lesson deleted.");closeMod("dModal");renderLessons();
+    }else if(delTarget.type==="material"){
+      if(!demo) await req(`/materials/${delTarget.id}`,"DELETE");
+      materials=materials.filter(m=>m.MaterialId!==delTarget.id);
+      toast("🗑️ Material removed.");closeMod("dModal");renderLessons();
+    }
+  }catch(e){toast("❌ "+e.message,"err");}
+  delTarget=null;
+}
+
+/* ══════════════════════════════════════════════
+   MODAL OVERLAY DISMISS
+══════════════════════════════════════════════ */
+document.querySelectorAll(".ovl").forEach(o=>{o.addEventListener("click",ev=>{if(ev.target===o)o.classList.remove("open");});});
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+loadAll();
 </script>
 </body>
 </html>
