@@ -159,6 +159,15 @@
     .btn-add-mat { font-size:11.5px; color:var(--teal); cursor:pointer; background:none; border:none; font-family:inherit; font-weight:600; padding:3px 0; }
     .btn-add-mat:hover { text-decoration:underline; }
 
+    /* Content preview in lessons table */
+    .content-preview { max-height:120px; overflow:hidden; position:relative; line-height:1.5; }
+    .content-preview p { margin:0 0 4px; }
+    .content-preview h1,.content-preview h2,.content-preview h3 { font-size:13px; margin:4px 0 2px; }
+    .content-preview table { font-size:11px; border-collapse:collapse; margin:4px 0; }
+    .content-preview td,.content-preview th { border:1px solid var(--border); padding:2px 6px; }
+    .content-preview ul,.content-preview ol { margin:2px 0 2px 16px; }
+    .content-preview::after { content:""; position:absolute; bottom:0; left:0; right:0; height:30px; background:linear-gradient(transparent,#fff); pointer-events:none; }
+
     /* MODAL */
     .ovl { display:none; position:fixed; inset:0; z-index:500; background:rgba(15,23,42,.45); align-items:center; justify-content:center; }
     .ovl.open { display:flex; }
@@ -194,6 +203,11 @@
 
     /* TOASTS */
     #toasts { position:fixed; top:62px; right:16px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+
+    /* CKEditor overrides */
+    .ck-editor__editable { min-height:250px; max-height:400px; font-family:'Open Sans',sans-serif; font-size:13px; }
+    .ck.ck-editor { border:1px solid var(--border); border-radius:5px; }
+    .ck.ck-toolbar { border-radius:5px 5px 0 0 !important; }
     .toast { padding:11px 16px; border-radius:5px; font-size:13px; font-weight:600; color:#fff; box-shadow:0 4px 14px rgba(0,0,0,.18); animation:tin .2s ease; max-width:300px; }
     .tok  { background:var(--green); }
     .terr { background:var(--red); }
@@ -349,12 +363,12 @@
 
 <!-- ═══════════ LESSON ADD/EDIT MODAL ═══════════ -->
 <div class="ovl" id="lModal">
-  <div class="modal">
+  <div class="modal" style="width:min(820px,95vw)">
     <div class="mhdr"><h2 id="lmTitle">Add Lesson</h2><button class="mcls" onclick="closeMod('lModal')">✕</button></div>
     <div class="mbdy">
       <div class="fgrid">
         <div class="fg full"><label>Lesson Title *</label><input class="fc" id="lfTitle" type="text" placeholder="e.g. Introduction to HTML" /><span class="ferr" id="leTitle"></span></div>
-        <div class="fg full"><label>Content</label><textarea class="fc" id="lfContent" placeholder="Lesson content or description…" style="min-height:90px"></textarea></div>
+        <div class="fg full"><label>Content</label><div id="lfContent"></div></div>
         <div class="fg"><label>Week Number *</label><input class="fc" id="lfWeek" type="number" min="1" max="16" placeholder="1" /><span class="ferr" id="leWeek"></span></div>
         <div class="fg"><label>Status</label><select class="fc" id="lfStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option><option value="Draft">Draft</option></select></div>
       </div>
@@ -392,6 +406,7 @@
 
 <div id="toasts"></div>
 
+<script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
 <script>
 /* ══════════════════════════════════════════════
    AUTH GUARD
@@ -462,6 +477,8 @@ let lEditId=null;
 let delTarget=null;
 // material add target
 let matTarget=null;
+// CKEditor instance
+let ckEditor=null;
 
 /* ══════════════════════════════════════════════
    UTILITIES
@@ -469,7 +486,10 @@ let matTarget=null;
 const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 function fmt(d){try{return new Date(d).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});}catch(_){return d||"—";}}
 function toast(m,t="ok"){const el=document.createElement("div");el.className=`toast ${t==="ok"?"tok":"terr"}`;el.textContent=m;document.getElementById("toasts").appendChild(el);setTimeout(()=>el.remove(),3200);}
-function closeMod(id){document.getElementById(id).classList.remove("open");}
+function closeMod(id){
+  if(id==='lModal'&&ckEditor){ckEditor.destroy().catch(()=>{});ckEditor=null;}
+  document.getElementById(id).classList.remove("open");
+}
 function statusBadge(s){const c=(s||"").trim().toLowerCase();if(c==="active")return`<span class="badge bActive">Active</span>`;if(c==="inactive")return`<span class="badge bInactive">Inactive</span>`;return`<span class="badge bDraft">${esc(s||"Draft")}</span>`;}
 
 /* ══════════════════════════════════════════════
@@ -715,7 +735,7 @@ function filterLessons(){
     return`<tr>
       <td class="idc">#${l.LessonId}</td>
       <td><strong>${esc(l.Title)}</strong></td>
-      <td style="max-width:320px;font-size:12.5px">${esc(l.Content)}
+      <td style="max-width:320px;font-size:12.5px"><div class="content-preview">${l.Content||""}</div>
         <div class="mat-list"><div class="mat-label">Additional Material:</div>
           ${lm.length?lm.map(m=>`<div class="mat-item"><span>${m.MaterialType==="attachment"?"📎":"🔗"}</span><a href="${esc(m.URL)}" target="_blank">${esc(m.Title)}</a> <span style="font-size:11px;color:var(--text-sm)">(${m.MaterialType})</span><button class="mat-del" onclick="openDelMaterial(${m.MaterialId},'${esc(m.Title).replace(/'/g,"\\'")}')">✕</button></div>`).join(""):`<div class="mat-item" style="color:var(--text-sm);font-style:italic">No materials added yet.</div>`}
           <button class="btn-add-mat" onclick="openAddMaterial(${currentCourseId},${l.LessonId})">+ Add material</button>
@@ -793,20 +813,38 @@ function openDelCourse(id){const c=courses.find(x=>x.courseId===id);delTarget={t
 /* ══════════════════════════════════════════════
    LESSON CRUD
 ══════════════════════════════════════════════ */
-function openAddLesson(){lEditId=null;["lfTitle","lfContent","lfWeek"].forEach(f=>document.getElementById(f).value="");document.getElementById("lfStatus").value="Active";["leTitle","leWeek"].forEach(f=>document.getElementById(f).textContent="");document.getElementById("lmTitle").textContent="Add Lesson";document.getElementById("lSavBtn").textContent="Save Lesson";document.getElementById("lModal").classList.add("open");}
+function initCKEditor(content){
+  if(ckEditor){ckEditor.destroy().catch(()=>{});ckEditor=null;}
+  return ClassicEditor.create(document.getElementById('lfContent'),{
+    toolbar:['heading','|','bold','italic','underline','|','bulletedList','numberedList','|','insertTable','link','blockQuote','codeBlock','|','undo','redo'],
+    heading:{options:[
+      {model:'paragraph',title:'Paragraph',class:'ck-heading_paragraph'},
+      {model:'heading1',view:'h1',title:'Heading 1',class:'ck-heading_heading1'},
+      {model:'heading2',view:'h2',title:'Heading 2',class:'ck-heading_heading2'},
+      {model:'heading3',view:'h3',title:'Heading 3',class:'ck-heading_heading3'}
+    ]},
+    table:{contentToolbar:['tableColumn','tableRow','mergeTableCells']},
+    placeholder:'Enter lesson content…'
+  }).then(editor=>{
+    ckEditor=editor;
+    if(content) editor.setData(content);
+  });
+}
+function openAddLesson(){lEditId=null;document.getElementById("lfTitle").value="";document.getElementById("lfWeek").value="";document.getElementById("lfStatus").value="Active";["leTitle","leWeek"].forEach(f=>document.getElementById(f).textContent="");document.getElementById("lmTitle").textContent="Add Lesson";document.getElementById("lSavBtn").textContent="Save Lesson";document.getElementById("lModal").classList.add("open");initCKEditor("");}
 function openEditLesson(id){
   const l=lessons.find(x=>x.LessonId===id);if(!l)return;lEditId=id;
-  document.getElementById("lfTitle").value=l.Title||"";document.getElementById("lfContent").value=l.Content||"";
+  document.getElementById("lfTitle").value=l.Title||"";
   document.getElementById("lfWeek").value=l.WeekNumber||"";document.getElementById("lfStatus").value=(l.Status||"Active").trim();
   ["leTitle","leWeek"].forEach(f=>document.getElementById(f).textContent="");
   document.getElementById("lmTitle").textContent="Edit Lesson";document.getElementById("lSavBtn").textContent="Update Lesson";document.getElementById("lModal").classList.add("open");
+  initCKEditor(l.Content||"");
 }
 async function saveLesson(){
   let ok=true;const t=document.getElementById("lfTitle").value.trim(),w=document.getElementById("lfWeek").value.trim();
   if(!t){document.getElementById("leTitle").textContent="Title is required.";ok=false;}else document.getElementById("leTitle").textContent="";
   if(!w){document.getElementById("leWeek").textContent="Week number is required.";ok=false;}else document.getElementById("leWeek").textContent="";
   if(!ok)return;
-  const body={CourseID:currentCourseId,Title:t,Content:document.getElementById("lfContent").value.trim(),WeekNumber:parseInt(w),Status:document.getElementById("lfStatus").value};
+  const body={CourseID:currentCourseId,Title:t,Content:ckEditor?ckEditor.getData():"",WeekNumber:parseInt(w),Status:document.getElementById("lfStatus").value};
   try{
     if(!lEditId){if(cDemo){body.LessonId=lessons.length?Math.max(...lessons.map(l=>l.LessonId))+1:1;body.CreatedAt=new Date().toISOString();body.UpdatedAt=new Date().toISOString();lessons.push(body);}else{lessons.push(await req(`/courses/${currentCourseId}/lessons`,"POST",body));}toast("✅ Lesson created!");}
     else{body.UpdatedAt=new Date().toISOString();if(cDemo){const i=lessons.findIndex(l=>l.LessonId===lEditId);if(i>-1)lessons[i]={...lessons[i],...body};}else{const u=await req(`/courses/${currentCourseId}/lessons/${lEditId}`,"PUT",body);const i=lessons.findIndex(l=>l.LessonId===lEditId);if(i>-1)lessons[i]=u;}toast("✏️ Lesson updated!");}
@@ -866,7 +904,7 @@ async function confirmDel(){
 /* ══════════════════════════════════════════════
    MODAL OVERLAY DISMISS
 ══════════════════════════════════════════════ */
-document.querySelectorAll(".ovl").forEach(o=>{o.addEventListener("click",ev=>{if(ev.target===o)o.classList.remove("open");});});
+document.querySelectorAll(".ovl").forEach(o=>{o.addEventListener("click",ev=>{if(ev.target===o){if(o.id==='lModal'&&ckEditor){ckEditor.destroy().catch(()=>{});ckEditor=null;}o.classList.remove("open");}});});
 
 /* ══════════════════════════════════════════════
    INIT
