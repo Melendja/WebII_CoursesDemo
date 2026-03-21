@@ -449,7 +449,7 @@ const SEED_MATERIALS = [
    STATE
 ══════════════════════════════════════════════ */
 let users=[], courses=[], lessons=[], materials=[];
-let demo=false;
+let demo=false, cDemo=false; // demo=users API offline, cDemo=courses API offline
 let currentView="users"; // "users" | "courses" | "lessons"
 let currentCourseId=null;
 // user editing
@@ -535,14 +535,26 @@ async function loadAll(){
   }catch(err){
     console.warn("⚠️ API unreachable, using demo data.",err.message);
     users=JSON.parse(JSON.stringify(SEED_USERS));
-    courses=JSON.parse(JSON.stringify(SEED_COURSES));
-    lessons=JSON.parse(JSON.stringify(SEED_LESSONS));
-    materials=JSON.parse(JSON.stringify(SEED_MATERIALS));
     demo=true;
     toast("⚠️ Using demo data — API offline","err");
   }
-  if(!demo){
-    try{courses=await req("/courses");}catch(_){courses=JSON.parse(JSON.stringify(SEED_COURSES));}
+  // Try courses endpoint independently
+  try{
+    if(!demo) courses=await req("/courses");
+    cDemo=false;
+  }catch(_){
+    console.warn("⚠️ Courses API not available, using demo courses.");
+    courses=JSON.parse(JSON.stringify(SEED_COURSES));
+    lessons=JSON.parse(JSON.stringify(SEED_LESSONS));
+    materials=JSON.parse(JSON.stringify(SEED_MATERIALS));
+    cDemo=true;
+    if(!demo) toast("⚠️ Courses using demo data — endpoint not ready","err");
+  }
+  if(demo){
+    courses=JSON.parse(JSON.stringify(SEED_COURSES));
+    lessons=JSON.parse(JSON.stringify(SEED_LESSONS));
+    materials=JSON.parse(JSON.stringify(SEED_MATERIALS));
+    cDemo=true;
   }
   navigate('users');
 }
@@ -662,7 +674,7 @@ function filterCourses(){
 ══════════════════════════════════════════════ */
 function viewLessons(courseId){
   currentView="lessons"; currentCourseId=courseId;
-  if(demo){ renderLessons(); return; }
+  if(cDemo){ renderLessons(); return; }
   req(`/courses/${courseId}/lessons`).then(d=>{lessons=d;return req(`/courses/${courseId}/materials`);})
     .then(d=>{materials=d;renderLessons();})
     .catch(()=>renderLessons());
@@ -771,8 +783,8 @@ async function saveCourse(){
   if(!ok)return;
   const body={CourseTitle:t,Remarks:document.getElementById("cfRemarks").value.trim(),instructorId:parseInt(ins),status:document.getElementById("cfStatus").value,isPublished:document.getElementById("cfPublished").value==="1"};
   try{
-    if(!cEditId){body.EditedDate=new Date().toISOString();if(demo){body.courseId=courses.length?Math.max(...courses.map(c=>c.courseId))+1:1;body.createdAt=new Date().toISOString();courses.push(body);}else{courses.push(await req("/courses","POST",body));}toast("✅ Course created!");}
-    else{body.EditedDate=new Date().toISOString();if(demo){const i=courses.findIndex(c=>c.courseId===cEditId);if(i>-1)courses[i]={...courses[i],...body};}else{const u=await req(`/courses/${cEditId}`,"PUT",body);const i=courses.findIndex(c=>c.courseId===cEditId);if(i>-1)courses[i]=u;}toast("✏️ Course updated!");}
+    if(!cEditId){body.EditedDate=new Date().toISOString();if(cDemo){body.courseId=courses.length?Math.max(...courses.map(c=>c.courseId))+1:1;body.createdAt=new Date().toISOString();courses.push(body);}else{courses.push(await req("/courses","POST",body));}toast("✅ Course created!");}
+    else{body.EditedDate=new Date().toISOString();if(cDemo){const i=courses.findIndex(c=>c.courseId===cEditId);if(i>-1)courses[i]={...courses[i],...body};}else{const u=await req(`/courses/${cEditId}`,"PUT",body);const i=courses.findIndex(c=>c.courseId===cEditId);if(i>-1)courses[i]=u;}toast("✏️ Course updated!");}
     closeMod("cModal");renderCourses();
   }catch(e){toast("❌ "+e.message,"err");}
 }
@@ -796,8 +808,8 @@ async function saveLesson(){
   if(!ok)return;
   const body={CourseID:currentCourseId,Title:t,Content:document.getElementById("lfContent").value.trim(),WeekNumber:parseInt(w),Status:document.getElementById("lfStatus").value};
   try{
-    if(!lEditId){if(demo){body.LessonId=lessons.length?Math.max(...lessons.map(l=>l.LessonId))+1:1;body.CreatedAt=new Date().toISOString();body.UpdatedAt=new Date().toISOString();lessons.push(body);}else{lessons.push(await req(`/courses/${currentCourseId}/lessons`,"POST",body));}toast("✅ Lesson created!");}
-    else{body.UpdatedAt=new Date().toISOString();if(demo){const i=lessons.findIndex(l=>l.LessonId===lEditId);if(i>-1)lessons[i]={...lessons[i],...body};}else{const u=await req(`/courses/${currentCourseId}/lessons/${lEditId}`,"PUT",body);const i=lessons.findIndex(l=>l.LessonId===lEditId);if(i>-1)lessons[i]=u;}toast("✏️ Lesson updated!");}
+    if(!lEditId){if(cDemo){body.LessonId=lessons.length?Math.max(...lessons.map(l=>l.LessonId))+1:1;body.CreatedAt=new Date().toISOString();body.UpdatedAt=new Date().toISOString();lessons.push(body);}else{lessons.push(await req(`/courses/${currentCourseId}/lessons`,"POST",body));}toast("✅ Lesson created!");}
+    else{body.UpdatedAt=new Date().toISOString();if(cDemo){const i=lessons.findIndex(l=>l.LessonId===lEditId);if(i>-1)lessons[i]={...lessons[i],...body};}else{const u=await req(`/courses/${currentCourseId}/lessons/${lEditId}`,"PUT",body);const i=lessons.findIndex(l=>l.LessonId===lEditId);if(i>-1)lessons[i]=u;}toast("✏️ Lesson updated!");}
     closeMod("lModal");renderLessons();
   }catch(e){toast("❌ "+e.message,"err");}
 }
@@ -814,7 +826,7 @@ async function saveMaterial(){
   if(!ok)return;
   const body={CourseID:matTarget.courseId,LessonId:matTarget.lessonId,Title:t,MaterialType:document.getElementById("mfType").value,URL:u};
   try{
-    if(demo){body.MaterialId=materials.length?Math.max(...materials.map(m=>m.MaterialId))+1:1;materials.push(body);}
+    if(cDemo){body.MaterialId=materials.length?Math.max(...materials.map(m=>m.MaterialId))+1:1;materials.push(body);}
     else{materials.push(await req(`/courses/${matTarget.courseId}/lessons/${matTarget.lessonId}/materials`,"POST",body));}
     toast("✅ Material added!");closeMod("mModal");renderLessons();
   }catch(e){toast("❌ "+e.message,"err");}
@@ -832,18 +844,18 @@ async function confirmDel(){
       users=users.filter(u=>u.userId!==delTarget.id);
       toast("🗑️ User deleted.");closeMod("dModal");renderUsers();
     }else if(delTarget.type==="course"){
-      if(!demo) await req(`/courses/${delTarget.id}`,"DELETE");
+      if(!cDemo) await req(`/courses/${delTarget.id}`,"DELETE");
       courses=courses.filter(c=>c.courseId!==delTarget.id);
       lessons=lessons.filter(l=>l.CourseID!==delTarget.id);
       materials=materials.filter(m=>m.CourseID!==delTarget.id);
       toast("🗑️ Course deleted.");closeMod("dModal");renderCourses();
     }else if(delTarget.type==="lesson"){
-      if(!demo) await req(`/courses/${currentCourseId}/lessons/${delTarget.id}`,"DELETE");
+      if(!cDemo) await req(`/courses/${currentCourseId}/lessons/${delTarget.id}`,"DELETE");
       lessons=lessons.filter(l=>l.LessonId!==delTarget.id);
       materials=materials.filter(m=>!(m.LessonId===delTarget.id&&m.CourseID===currentCourseId));
       toast("🗑️ Lesson deleted.");closeMod("dModal");renderLessons();
     }else if(delTarget.type==="material"){
-      if(!demo) await req(`/materials/${delTarget.id}`,"DELETE");
+      if(!cDemo) await req(`/materials/${delTarget.id}`,"DELETE");
       materials=materials.filter(m=>m.MaterialId!==delTarget.id);
       toast("🗑️ Material removed.");closeMod("dModal");renderLessons();
     }
