@@ -1538,6 +1538,134 @@
             margin-bottom: 0;
         }
 
+        /* Class Content Rich Layout */
+        .class-content-layout {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .class-content-main {
+            flex: 1;
+            min-width: 0;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-dark);
+        }
+
+        .class-content-main p {
+            margin-bottom: 1rem;
+        }
+
+        .class-content-main h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.4rem;
+            color: var(--primary-blue);
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .class-content-main h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .class-content-main ul,
+        .class-content-main ol {
+            margin: 0.5rem 0 1rem 1.5rem;
+        }
+
+        .class-content-main li {
+            margin-bottom: 0.3rem;
+        }
+
+        .class-content-main a {
+            color: var(--link-blue);
+            text-decoration: underline;
+        }
+
+        .class-content-main a:hover {
+            color: var(--primary-blue);
+        }
+
+        .class-content-main table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .class-content-main table td {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-light);
+            vertical-align: top;
+            line-height: 1.5;
+        }
+
+        .class-content-main table td strong {
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .class-content-sidebar {
+            width: 240px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 1rem;
+            align-self: flex-start;
+        }
+
+        .additional-materials-box {
+            background: var(--bg-cream);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+        }
+
+        .additional-materials-box h4 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .additional-material-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .additional-material-item svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--text-muted);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .additional-material-item a {
+            font-size: 0.85rem;
+            color: var(--link-blue);
+            text-decoration: underline;
+            line-height: 1.4;
+        }
+
+        .additional-material-item a:hover {
+            color: var(--primary-blue);
+        }
+
+        .additional-material-item .attachment-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
         /* Responsive */
         @media (max-width: 1200px) {
             .discussion-layout {
@@ -1551,6 +1679,13 @@
                 flex-direction: column;
             }
             .project-team-panel {
+                width: 100%;
+                position: static;
+            }
+            .class-content-layout {
+                flex-direction: column;
+            }
+            .class-content-sidebar {
                 width: 100%;
                 position: static;
             }
@@ -1936,11 +2071,14 @@
                         { id: 15, title: 'Week 15', dates: 'Apr 26-May 2', start: '2026-04-26', end: '2026-05-02' },
                         { id: 16, title: 'Week 16', dates: 'May 3-8',      start: '2026-05-03', end: '2026-05-08' },
                     ];
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
+                    // Use local date string comparison to avoid UTC/timezone issues
+                    const now = new Date();
+                    const todayStr = now.getFullYear() + '-' +
+                        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(now.getDate()).padStart(2, '0');
                     return weekRanges.map(w => ({
                         ...w,
-                        isCurrent: today >= new Date(w.start) && today <= new Date(w.end)
+                        isCurrent: todayStr >= w.start && todayStr <= w.end
                     }));
                 })(),
             ],
@@ -2012,15 +2150,64 @@
         }
 
         // Sample content for demonstration
-        const sampleContent = {
-            content: {
+        const weekContentData = {
+            9: {
+                title: 'Title here',
+                additionalMaterials: [
+                    { label: 'Understanding Fullstack', type: 'attachment', url: '#' }
+                ],
+                body: `
+                    <p>These are all the requirements of documenting a client/server project. Your documentation at the end of the semester will contain all of this in the documentation. In <a href="#">Assignment 3 - Project Documentation</a> you will establish the outline of your documentation and select hosting for this documentation. For Assignment 1 - you only need to complete Item 1 on this list.</p>
+
+                    <p><strong>1. Executive Summary &amp; Project Overview</strong></p>
+                    <ul>
+                        <li>Project goals and objectives</li>
+                        <li>Key stakeholders and their roles</li>
+                        <li>Business value and expected outcomes</li>
+                        <li>High-level timeline and budget constraints</li>
+                        <li>Critical success factors</li>
+                    </ul>
+
+                    <h2>Guidelines for Documentation</h2>
+                    <table>
+                        <tr>
+                            <td><strong>Use Clear Structure</strong>- Consistent formatting<br>- Numbered sections<br>- Table of contents<br>- Version control</td>
+                            <td><strong>Be Specific</strong>- Measurable requirements<br>- Clear success criteria<br>- Defined priorities<br>- Explicit dependencies</td>
+                            <td><strong>Include Visual Elements</strong>- Architecture diagrams<br>- Workflow diagrams<br>- Mockups/wireframes<br>- Data flow diagrams<br>- State diagrams</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Maintain Traceability</strong>- Requirement IDs<br>- Cross-references<br>- Change history<br>- Approval tracking</td>
+                            <td><strong>Keep it Updated</strong>- Regular reviews<br>- Change management process<br>- Version control<br>- Stakeholder sign-offs</td>
+                            <td><strong>Consider Future Needs</strong>- Scalability requirements<br>- Maintenance requirements<br>- Future integrations<br>- Technology evolution</td>
+                        </tr>
+                    </table>
+
+                    <h2>Documentation Outline</h2>
+
+                    <h3>Executive Summary &amp; Project Overview</h3>
+                    <ul>
+                        <li>Goals and objectives - what will this software do? What goals do the developers have for the software? What are the business goals?</li>
+                        <li>Key stakeholders and their roles - List all stakeholders. Identify primary users and their expectations.</li>
+                        <li>Business value and expected outcomes - Is this marketable? What would be the savings of using this? Money? Time?</li>
+                        <li>Critical success factors - What defines the success of the software?</li>
+                    </ul>
+                `
+            }
+        };
+
+        // Fallback content for weeks without specific content
+        function getDefaultWeekContent(week) {
+            return {
                 title: 'Class Content',
-                items: [
-                    { title: 'Lecture Video: Introduction to Management Principles', desc: 'Core concepts and frameworks for effective supervision', duration: '45 min', type: 'Video' },
-                    { title: 'Reading: Leadership Styles Overview', desc: 'Chapter 3 from the course textbook', duration: '20 min', type: 'Reading' },
-                    { title: 'Supplementary Materials', desc: 'Additional resources and case studies', duration: '15 min', type: 'PDF' }
-                ]
-            },
+                additionalMaterials: [],
+                body: `
+                    <p>Content for <strong>${week.title}</strong> will be available when this week begins.</p>
+                    <p><em>Check back during the week of ${week.dates} for lecture materials, readings, and supplementary resources.</em></p>
+                `
+            };
+        }
+
+        const sampleContent = {
             discussions: {
                 title: 'Discussions',
                 isDiscussion: true,
@@ -2295,6 +2482,47 @@
                                 `).join('')}
                             </div>
                         </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Handle Class Content with rich layout
+            if (itemId === 'content') {
+                const weekContent = weekContentData[weekId] || getDefaultWeekContent(week);
+                contentArea.classList.remove('full-width');
+                
+                const materialsHTML = weekContent.additionalMaterials.length > 0
+                    ? `<div class="class-content-sidebar">
+                        <div class="additional-materials-box">
+                            <h4>Additional Material:</h4>
+                            ${weekContent.additionalMaterials.map(mat => `
+                                <div class="additional-material-item">
+                                    <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg>
+                                    <div>
+                                        <a href="${mat.url}">${mat.label}</a>
+                                        ${mat.type ? ` <span class="attachment-label">(${mat.type})</span>` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>`
+                    : '';
+
+                contentArea.innerHTML = `
+                    <div class="content-breadcrumb">
+                        <a href="#" class="home-icon" onclick="showWelcomeContent(); return false;" title="Home">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        </a>
+                        ${week.title} (${week.dates}) / <span>Class Content</span>
+                    </div>
+                    <h1 class="content-title">${weekContent.title}</h1>
+                    <p class="content-subtitle">${week.title} • ${week.dates}</p>
+                    <div class="class-content-layout">
+                        <div class="class-content-main">
+                            ${weekContent.body}
+                        </div>
+                        ${materialsHTML}
                     </div>
                 `;
                 return;
