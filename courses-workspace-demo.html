@@ -392,11 +392,12 @@
             background: var(--white);
             overflow-y: auto;
             position: relative;
+            min-height: 0;
         }
 
         .content-wrapper {
             padding: 2.5rem 3rem;
-            max-width: 900px;
+            max-width: 1170px;
         }
 
         .content-wrapper.full-width {
@@ -2151,7 +2152,7 @@
 
         // Sample content for demonstration
         const weekContentData = {
-            9: {
+            1: {
                 title: 'Title here',
                 additionalMaterials: [
                     { label: 'Understanding Fullstack', type: 'attachment', url: '#' }
@@ -2498,6 +2499,11 @@
                     const textLessons = liveModule.lessons.filter(l => l.contentType !== 'FILE');
                     const fileLessons = liveModule.lessons.filter(l => l.contentType === 'FILE');
 
+                    // Title comes from the FIRST lesson's title in the Lesson table
+                    const pageTitle = textLessons.length > 0
+                        ? textLessons[0].title
+                        : (fileLessons.length > 0 ? fileLessons[0].title : liveModule.title);
+
                     const bodyHTML = textLessons.map(lesson => {
                         if (lesson.contentType === 'VIDEO') {
                             return `<h3>${lesson.title}</h3>
@@ -2505,18 +2511,20 @@
                                     <p>${lesson.content}</p>
                                 </div>`;
                         }
-                        // TEXT — content is stored as HTML in the database
+                        // TEXT — content field stores the HTML body from the database
                         return lesson.content;
                     }).join('');
 
+                    // FILE lessons become Additional Materials
+                    // The content field holds the actual URL
                     const additionalMaterials = fileLessons.map(f => ({
                         label: f.title,
                         type: 'attachment',
-                        url: f.content  // content field holds the URL for FILE type
+                        url: f.content  // Lesson.content = the file URL
                     }));
 
                     weekContent = {
-                        title: liveModule.title || ('Week ' + weekId + ' Content'),
+                        title: pageTitle,
                         additionalMaterials: additionalMaterials,
                         body: bodyHTML || '<p><em>No lesson content available yet.</em></p>'
                     };
