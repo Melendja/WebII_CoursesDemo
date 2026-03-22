@@ -158,6 +158,23 @@
     .mat-del:hover { opacity:1; }
     .btn-add-mat { font-size:11.5px; color:var(--teal); cursor:pointer; background:none; border:none; font-family:inherit; font-weight:600; padding:3px 0; }
     .btn-add-mat:hover { text-decoration:underline; }
+    .lesson-content-wrap { position:relative; }
+    .lesson-content-preview { max-height:80px; overflow:hidden; font-size:12.5px; line-height:1.5; transition:max-height 0.3s ease; }
+    .lesson-content-preview.expanded { max-height:none; }
+    .lesson-content-preview .rendered-html { font-size:12.5px; line-height:1.6; }
+    .lesson-content-preview .rendered-html h2 { font-size:14px; font-weight:700; margin:8px 0 4px; }
+    .lesson-content-preview .rendered-html h3 { font-size:13px; font-weight:700; margin:6px 0 3px; }
+    .lesson-content-preview .rendered-html p { margin:4px 0; }
+    .lesson-content-preview .rendered-html ul,.lesson-content-preview .rendered-html ol { margin:4px 0 4px 16px; }
+    .lesson-content-preview .rendered-html li { margin:2px 0; }
+    .lesson-content-preview .rendered-html table { border-collapse:collapse; width:100%; margin:6px 0; font-size:11.5px; }
+    .lesson-content-preview .rendered-html td { border:1px solid var(--border); padding:4px 6px; vertical-align:top; }
+    .lesson-content-preview .rendered-html a { color:var(--blue); }
+    .lesson-content-preview .rendered-html strong { font-weight:700; }
+    .content-toggle { background:none; border:none; color:var(--blue); font-size:11.5px; font-weight:600; cursor:pointer; padding:3px 0; font-family:inherit; }
+    .content-toggle:hover { text-decoration:underline; }
+    .content-fade { position:relative; }
+    .content-fade:not(.expanded)::after { content:""; position:absolute; bottom:0; left:0; right:0; height:30px; background:linear-gradient(transparent, white); pointer-events:none; }
 
     /* MODAL */
     .ovl { display:none; position:fixed; inset:0; z-index:500; background:rgba(15,23,42,.45); align-items:center; justify-content:center; }
@@ -695,6 +712,17 @@ function renderLessons(){
   filterLessons();
 }
 
+function toggleLessonContent(id){
+  const el=document.getElementById("lcp-"+id);
+  const btn=el.parentElement.querySelector(".content-toggle");
+  if(el.classList.contains("expanded")){
+    el.classList.remove("expanded");
+    btn.textContent="▼ Show more";
+  }else{
+    el.classList.add("expanded");
+    btn.textContent="▲ Show less";
+  }
+}
 function filterLessons(){
   const q=(document.getElementById("lSrch")?.value||"").toLowerCase();
   const cls=lessons.filter(l=>l.CourseID===currentCourseId);
@@ -707,7 +735,7 @@ function filterLessons(){
     return`<tr>
       <td class="idc">#${l.LessonId}</td>
       <td><strong>${esc(l.Title)}</strong></td>
-      <td style="max-width:320px;font-size:12.5px">${esc(l.Content)}
+      <td style="max-width:400px"><div class="lesson-content-wrap"><div class="content-fade lesson-content-preview" id="lcp-${l.LessonId}"><div class="rendered-html">${l.Content||""}</div></div><button class="content-toggle" onclick="toggleLessonContent(${l.LessonId})">▼ Show more</button></div>
         <div class="mat-list"><div class="mat-label">Additional Material:</div>
           ${lm.length?lm.map(m=>`<div class="mat-item"><span>${m.MaterialType==="attachment"?"📎":"🔗"}</span><a href="${esc(m.URL)}" target="_blank">${esc(m.Title)}</a> <span style="font-size:11px;color:var(--text-sm)">(${m.MaterialType})</span><button class="mat-del" onclick="openDelMaterial(${m.MaterialId},'${esc(m.Title).replace(/'/g,"\\'")}')">✕</button></div>`).join(""):`<div class="mat-item" style="color:var(--text-sm);font-style:italic">No materials added yet.</div>`}
           <button class="btn-add-mat" onclick="openAddMaterial(${currentCourseId},${l.LessonId})">+ Add material</button>
