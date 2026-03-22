@@ -132,45 +132,71 @@ const EMAIL_SVG  = `<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99
   }
 
   /* ════════════════════════════════════════════════════════════
-     MODULE + LESSON FETCHING — powers live Class Content
+     LESSON + MATERIAL FETCHING — powers live Class Content
+     Uses dbo.Course_Lessons (keyed by WeekNumber)
+     and materials (linked by LessonId)
   ════════════════════════════════════════════════════════════ */
-  async function fetchModulesWithLessons() {
+  async function fetchLessonsAndMaterials() {
     try {
-      // Fetch all modules for courseId=1
-      const modules = await get("/api/modules");
-      if (!modules || !modules.length) {
-        console.log("📦 No modules found in database");
+      // Fetch all lessons + materials for courseId=1 (same endpoints admin page uses)
+      const [lessons, materials] = await Promise.all([
+        get("/api/courses/1/lessons").catch(() => []),
+        get("/api/courses/1/materials").catch(() => [])
+      ]);
+
+      if (!lessons || !lessons.length) {
+        console.log("📦 No lessons found in Course_Lessons");
         return;
       }
 
-      // For each module, fetch its lessons
-      // Module orderIndex maps to week number
+      // Group lessons by WeekNumber
       window.lmsModules = {};
 
-      const lessonPromises = modules.map(async (mod) => {
-        try {
-          const lessons = await get(`/api/modules/${mod.moduleId}/lessons`);
-          const weekNum = mod.orderIndex; // orderIndex = week number
-          window.lmsModules[weekNum] = {
-            moduleId: mod.moduleId,
-            title: mod.title,
-            description: mod.description,
-            orderIndex: mod.orderIndex,
-            lessons: lessons || []
+      lessons.forEach(lesson => {
+        const wk = lesson.WeekNumber || lesson.weekNumber;
+        if (!wk) return;
+
+        if (!window.lmsModules[wk]) {
+          window.lmsModules[wk] = {
+            title: null,
+            lessons: [],
+            materials: []
           };
-        } catch (err) {
-          console.warn(`⚠️ Could not fetch lessons for module ${mod.moduleId}:`, err.message);
+        }
+        window.lmsModules[wk].lessons.push(lesson);
+
+        // Use the first lesson's Title as the page title for that week
+        if (!window.lmsModules[wk].title) {
+          window.lmsModules[wk].title = lesson.Title || lesson.title;
         }
       });
 
-      await Promise.all(lessonPromises);
+      // Attach materials to their week by matching LessonId
+      if (materials && materials.length) {
+        materials.forEach(mat => {
+          const lessonId = mat.LessonId || mat.lessonId;
+          // Find which week this material belongs to
+          for (const wk in window.lmsModules) {
+            const weekData = window.lmsModules[wk];
+            const match = weekData.lessons.find(l =>
+              (l.LessonId || l.lessonId) === lessonId
+            );
+            if (match) {
+              weekData.materials.push(mat);
+              break;
+            }
+          }
+        });
+      }
 
       const totalLessons = Object.values(window.lmsModules)
         .reduce((sum, m) => sum + m.lessons.length, 0);
-      console.log(`✅ Loaded ${modules.length} modules with ${totalLessons} lessons from daytona_lms`);
+      const totalMats = Object.values(window.lmsModules)
+        .reduce((sum, m) => sum + m.materials.length, 0);
+      console.log(`✅ Loaded ${totalLessons} lessons + ${totalMats} materials from Course_Lessons`);
 
     } catch (err) {
-      console.warn("⚠️ Could not fetch modules:", err.message);
+      console.warn("⚠️ Could not fetch lessons:", err.message);
     }
   }
 
@@ -198,8 +224,8 @@ const EMAIL_SVG  = `<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99
     patchUsersTable(users);
     showStatus(true);
 
-    // Fetch modules + lessons for live Class Content
-    await fetchModulesWithLessons();
+    // Fetch lessons + materials for live Class Content
+    await fetchLessonsAndMaterials();
 
     console.log(`✅ daytona_lms connected — ${users.length} users, ${courses.length} courses`);
 
