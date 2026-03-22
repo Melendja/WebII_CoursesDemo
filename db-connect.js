@@ -82,10 +82,10 @@ const EMAIL_SVG  = `<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99
         <div class="contact-avatar">${AVATAR_SVG}</div>
         <div class="contact-info">
           <h4>${u.firstName} ${u.lastName}</h4>
-          <p>${u.email}</p>
         </div>
         <a class="email-icon-link" href="mailto:${u.email}" title="Email ${u.firstName}">
           ${EMAIL_SVG}
+          <span class="email-label">Email</span>
         </a>
       </div>`;
   }
