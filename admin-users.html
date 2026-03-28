@@ -607,7 +607,8 @@ function filterUsers(){
   const s=document.getElementById("uSFlt")?.value||"";
   const f=users.filter(u=>{
     const n=`${u.firstName} ${u.lastName} ${u.email}`.toLowerCase();
-    return(!q||n.includes(q))&&(!r||u.role===r)&&(s===""||String(u.isActive)===s);
+    const activeMatch = s==="" || (s==="1" ? !!u.isActive : !u.isActive);
+    return(!q||n.includes(q))&&(!r||u.role===r)&&activeMatch;
   });
   document.getElementById("uCnt").textContent=f.length;
   const tb=document.getElementById("uTbody");
