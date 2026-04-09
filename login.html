@@ -78,14 +78,6 @@
     .welcome h1 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
     .welcome p  { font-size: 13.5px; color: var(--text-sm); }
 
-    .role-pills { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
-    .role-pill {
-      padding: 3px 10px; border-radius: 99px;
-      font-size: 11px; font-weight: 700; border: 1.5px solid;
-    }
-    .role-pill.admin      { background:#fef3c7; border-color:#f59e0b; color:#92400e; }
-    .role-pill.instructor { background:#dbeafe; border-color:#3b82f6; color:#1e3a8a; }
-    .role-pill.student    { background:#dcfce7; border-color:#22c55e; color:#14532d; }
 
     /* Card */
     .card {
@@ -291,11 +283,6 @@
       <div class="welcome-icon">🔐</div>
       <h1>LMS Portal</h1>
       <p>Sign in to access your course workspace.</p>
-      <div class="role-pills">
-        <span class="role-pill admin">⚙️ Admin</span>
-        <span class="role-pill instructor">🏫 Instructor</span>
-        <span class="role-pill student">🎓 Student</span>
-      </div>
     </div>
 
     <div class="card">
@@ -343,6 +330,11 @@
 
         <button class="btn-login" id="loginBtn" onclick="doLogin()">
           Sign In →
+        </button>
+
+        <button type="button" class="forgot-link" id="forgotLink"
+                style="display:none" onclick="openForgotModal()">
+          Forgot your password?
         </button>
 
       </div>
@@ -607,6 +599,9 @@
   function showError(msg) {
     document.getElementById("errTxt").textContent = msg;
     document.getElementById("errMsg").classList.add("show");
+    // Reveal "Forgot your password?" after the first failed attempt
+    const fl = document.getElementById("forgotLink");
+    if (fl) fl.style.display = "block";
   }
   function clearErrors() {
     document.getElementById("errMsg").classList.remove("show");
