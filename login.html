@@ -6,6 +6,35 @@
   <title>Login | Web Systems II – Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!--
+  ╔══════════════════════════════════════════════════════════════════════════╗
+  ║  ROLE-BASED ACCESS CONTROL  –  Node.js / ASP.NET RBAC Pattern           ║
+  ║  ─────────────────────────────────────────────────────────────────────  ║
+  ║  Mirrors the RBAC middleware pattern used in:                            ║
+  ║    • ASP.NET Core  → [Authorize(Roles = "ADMIN|INSTRUCTOR|STUDENT")]     ║
+  ║    • Node.js/Express → requireRole('ADMIN') middleware                   ║
+  ║                                                                          ║
+  ║  Session Claims stored in sessionStorage (simulates JWT payload):        ║
+  ║    lms_auth      – "true" when authenticated                             ║
+  ║    lms_userId    – numeric user ID from DB                               ║
+  ║    lms_email     – user's email                                          ║
+  ║    lms_firstName – given name                                            ║
+  ║    lms_lastName  – family name                                           ║
+  ║    lms_role      – ADMIN | INSTRUCTOR | STUDENT                          ║
+  ║    lms_isActive  – 1 | 0                                                 ║
+  ║                                                                          ║
+  ║  Routing (Authorization Policy):                                         ║
+  ║    ADMIN       → admin-users.html                                        ║
+  ║    INSTRUCTOR  → courses-workspace-demo.html  (GitHub Pages)             ║
+  ║    STUDENT     → courses-workspace-demo.html  (GitHub Pages)             ║
+  ╚══════════════════════════════════════════════════════════════════════════╝
+  -->
+
+  <!-- bcryptjs CDN – enables client-side bcrypt hash verification -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"
+          integrity="sha512-V7KlCt3Dydx2YFp0B8OsM0q/Q0XnqPCqFhE+f7Y7KTxz4N4V0jhWz4vWuoNKC8H28oNePqU1lxW9fzewHFGA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -16,6 +45,7 @@
       --teal:    #0e7569;
       --blue:    #2563eb;
       --red:     #dc2626;
+      --green:   #16a34a;
       --border:  #e5e7eb;
       --bg:      #f0f2f5;
       --text:    #111827;
@@ -53,14 +83,10 @@
       padding: 40px 16px;
     }
 
-    .login-wrap {
-      width: 100%; max-width: 420px;
-    }
+    .login-wrap { width: 100%; max-width: 420px; }
 
     /* Welcome block */
-    .welcome {
-      text-align: center; margin-bottom: 28px;
-    }
+    .welcome { text-align: center; margin-bottom: 28px; }
     .welcome-icon {
       width: 64px; height: 64px; border-radius: 16px;
       background: var(--navy);
@@ -71,11 +97,24 @@
     .welcome h1 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
     .welcome p  { font-size: 13.5px; color: var(--text-sm); }
 
+    /* Role Pills */
+    .role-pills {
+      display: flex; justify-content: center; gap: 8px;
+      margin-top: 12px; flex-wrap: wrap;
+    }
+    .role-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 11px; font-weight: 700; border: 1.5px solid;
+    }
+    .role-pill.admin      { background:#fef3c7; border-color:#f59e0b; color:#92400e; }
+    .role-pill.instructor { background:#dbeafe; border-color:#3b82f6; color:#1e3a8a; }
+    .role-pill.student    { background:#dcfce7; border-color:#22c55e; color:#14532d; }
+
     /* Card */
     .card {
       background: #fff; border: 1px solid var(--border); border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+      overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.08);
     }
     .card-hdr {
       background: var(--navy); padding: 14px 22px;
@@ -84,6 +123,14 @@
     .card-hdr h2 { font-size: 14px; font-weight: 700; color: #fff; }
     .card-hdr p  { font-size: 12px; color: #a8bcce; margin-top: 2px; }
     .card-body { padding: 24px 22px; }
+
+    /* Role hint */
+    .login-hint {
+      background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 5px;
+      padding: 8px 12px; font-size: 11.5px; color: #0369a1;
+      margin-bottom: 16px;
+    }
+    .login-hint strong { font-weight: 700; }
 
     /* Form */
     .fg { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
@@ -102,8 +149,7 @@
     .pw-eye {
       position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
       background: none; border: none; cursor: pointer;
-      font-size: 16px; color: var(--text-sm); padding: 0;
-      line-height: 1;
+      font-size: 16px; color: var(--text-sm); padding: 0; line-height: 1;
     }
     .pw-eye:hover { color: var(--text); }
 
@@ -111,10 +157,28 @@
       background: #fef2f2; border: 1px solid #fecaca; border-radius: 5px;
       padding: 10px 14px; font-size: 12.5px; color: var(--red);
       font-weight: 600; display: none; margin-bottom: 16px;
-      display: flex; align-items: center; gap: 8px;
+      align-items: center; gap: 8px;
     }
     .err-msg.show { display: flex; }
-    .err-msg { display: none; }
+
+    /* Loading overlay on card */
+    .card-loading {
+      display: none; position: absolute; inset: 0;
+      background: rgba(255,255,255,.85); border-radius: 8px;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 10px; font-size: 13px;
+      color: var(--navy); font-weight: 600;
+      z-index: 10;
+    }
+    .card-loading.show { display: flex; }
+    .card { position: relative; }
+
+    .spinner {
+      width: 32px; height: 32px; border: 3px solid #e5e7eb;
+      border-top-color: var(--navy); border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .btn-login {
       width: 100%; padding: 11px; border-radius: 5px;
@@ -125,13 +189,18 @@
     }
     .btn-login:hover { background: var(--navy-dk); }
     .btn-login:active { opacity: .9; }
-    .btn-login.loading { opacity: .7; pointer-events: none; }
-
+    .btn-login:disabled { opacity: .6; cursor: not-allowed; }
 
     /* Footer */
     footer {
       text-align: center; padding: 16px;
       font-size: 11.5px; color: var(--text-sm);
+    }
+
+    @keyframes shake {
+      0%,100%{ transform: translateX(0) }
+      20%,60%{ transform: translateX(-6px) }
+      40%,80%{ transform: translateX(6px) }
     }
   </style>
 </head>
@@ -152,32 +221,52 @@
 
     <div class="welcome">
       <div class="welcome-icon">🔐</div>
-      <h1>Admin Portal</h1>
-      <p>Sign in to access the LMS administration panel.</p>
+      <h1>LMS Portal</h1>
+      <p>Sign in to access your course workspace.</p>
+      <!-- Role indicators — mirrors ASP.NET [Authorize(Roles="...")] visual cue -->
+      <div class="role-pills">
+        <span class="role-pill admin">⚙️ Admin</span>
+        <span class="role-pill instructor">🏫 Instructor</span>
+        <span class="role-pill student">🎓 Student</span>
+      </div>
     </div>
 
     <div class="card">
+
+      <!-- Loading overlay (shown while bcrypt.compare runs) -->
+      <div class="card-loading" id="cardLoading">
+        <div class="spinner"></div>
+        <span>Verifying credentials…</span>
+      </div>
+
       <div class="card-hdr">
         <h2>Sign In</h2>
-        <p>daytona_lms · Admin Access</p>
+        <p>daytona_lms · Role-Based Access</p>
       </div>
       <div class="card-body">
+
+        <div class="login-hint">
+          <strong>Admin:</strong> use username <em>Admin</em> &nbsp;|&nbsp;
+          <strong>Instructor / Students:</strong> use your <em>@daytona(state).edu</em> email
+        </div>
 
         <div class="err-msg" id="errMsg">
           ⚠️ <span id="errTxt">Invalid username or password.</span>
         </div>
 
         <div class="fg">
-          <label for="uname">Username</label>
-          <input class="fc" id="uname" type="text" placeholder="Enter username"
-            autocomplete="username" />
+          <label for="uname">Username / Email</label>
+          <input class="fc" id="uname" type="text"
+                 placeholder="Admin  –or–  you@daytonastate.edu"
+                 autocomplete="username" />
         </div>
 
         <div class="fg">
           <label for="upass">Password</label>
           <div class="pw-wrap">
-            <input class="fc" id="upass" type="password" placeholder="Enter password"
-              autocomplete="current-password" />
+            <input class="fc" id="upass" type="password"
+                   placeholder="Enter password"
+                   autocomplete="current-password" />
             <button type="button" class="pw-eye" id="eyeBtn" onclick="togglePw()">👁️</button>
           </div>
         </div>
@@ -197,58 +286,271 @@
 </footer>
 
 <script>
-  /* ── Already logged in? Skip to admin ── */
-  if (sessionStorage.getItem("lms_auth") === "true") {
-    window.location.replace("admin-users.html");
-  }
+/* ═══════════════════════════════════════════════════════════════════════════
+   RBAC CONFIGURATION
+   ─────────────────────────────────────────────────────────────────────────
+   Pattern mirrors:
+     ASP.NET Core  → services.AddAuthorization(o => o.AddPolicy(...))
+     Node/Express  → const rbac = new RBAC({ roles: [...], permissions: [...] })
 
-  /* ── Toggle password visibility ── */
+   Roles defined:
+     ADMIN       – Full system access → admin-users.html
+     INSTRUCTOR  – Course management → courses-workspace-demo.html
+     STUDENT     – Course view/interact → courses-workspace-demo.html
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+  // ── Authorization Policies (mirrors ASP.NET AddPolicy / Node rbac config) ──
+  const AUTH_POLICIES = {
+    ADMIN:      { redirect: "admin-users.html" },
+    INSTRUCTOR: { redirect: "https://melendja.github.io/WebII_CoursesDemo/courses-workspace-demo.html" },
+    STUDENT:    { redirect: "https://melendja.github.io/WebII_CoursesDemo/courses-workspace-demo.html" }
+  };
+
+  // ── In-memory User Store ──────────────────────────────────────────────────
+  // Mirrors the DB schema: users(userId, email, passwordHash, role, firstName, lastName, isActive)
+  //
+  // ⚠️  PASSWORD HASHES: The hashes below are truncated in this demo because
+  //     the DB screenshot only showed partial values.  Replace each hash with
+  //     the FULL bcrypt hash string from your SQLite/SQL Server database.
+  //     bcrypt hashes are exactly 60 characters and begin with "$2b$12$..."
+  //
+  // NOTE: Two accounts (userId 8, 9) appear to use NON-bcrypt storage.
+  //       userId 8 → plain-text comparison applied automatically
+  //       userId 9 → isActive = 0, account is DISABLED regardless of password
+  //
+  const USER_STORE = [
+    // ── ADMIN (local account, no DB row) ────────────────────────────────────
+    {
+      userId:    1,
+      email:     null,               // Admin uses username, not email
+      username:  "Admin",            // [Authorize(Roles = "ADMIN")]
+      password:  "521F",             // plain-text (admin-only exception)
+      hashType:  "plain",
+      role:      "ADMIN",
+      firstName: "Admin",
+      lastName:  "User",
+      isActive:  1
+    },
+
+    // ── INSTRUCTOR ───────────────────────────────────────────────────────────
+    {
+      userId:    2,
+      email:     "instructor@daytona.edu",
+      // 🔴 REPLACE with full 60-char hash from DB → SELECT passwordHash FROM users WHERE userId=2
+      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_2",
+      hashType:  "bcrypt",
+      role:      "INSTRUCTOR",
+      firstName: "Ronald",
+      lastName:  "Eaglin",
+      isActive:  1
+    },
+
+    // ── STUDENTS ─────────────────────────────────────────────────────────────
+    {
+      userId:    3,
+      email:     "aram_anderson@daytonastate.edu",
+      // 🔴 REPLACE → SELECT passwordHash FROM users WHERE userId=3
+      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_3",
+      hashType:  "bcrypt",
+      role:      "STUDENT",
+      firstName: "Aram",
+      lastName:  "Anderson",
+      isActive:  1
+    },
+    {
+      userId:    4,
+      email:     "kae_bauder@daytonastate.edu",
+      // 🔴 REPLACE → SELECT passwordHash FROM users WHERE userId=4
+      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_4",
+      hashType:  "bcrypt",
+      role:      "STUDENT",
+      firstName: "Kae",
+      lastName:  "Bauder",
+      isActive:  1
+    },
+    {
+      userId:    5,
+      email:     "john_bellino@daytonastate.edu",
+      // 🔴 REPLACE → SELECT passwordHash FROM users WHERE userId=5
+      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_5",
+      hashType:  "bcrypt",
+      role:      "STUDENT",
+      firstName: "John",
+      lastName:  "Bellino",
+      isActive:  1
+    },
+    {
+      userId:    6,
+      email:     "jeremiah_buckley-williams@daytonastate.edu",
+      // 🔴 REPLACE → SELECT passwordHash FROM users WHERE userId=6
+      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_6",
+      hashType:  "bcrypt",
+      role:      "STUDENT",
+      firstName: "Jeremiah",
+      lastName:  "Buckley-Williams",
+      isActive:  1
+    },
+    {
+      userId:    7,
+      email:     "jose_melendez4701@daytonastate.edu",
+      // 🔴 REPLACE → SELECT passwordHash FROM users WHERE userId=7
+      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_7",
+      hashType:  "bcrypt",
+      role:      "STUDENT",
+      firstName: "Jose A.",
+      lastName:  "Melendez",
+      isActive:  1
+    },
+    {
+      userId:    8,
+      email:     "daniela_arocho@daytonastate.edu",
+      // Non-bcrypt: stored as plaintext in DB → plain comparison used
+      password:  "C6ce4RRxPc4",
+      hashType:  "plain",
+      role:      "STUDENT",
+      firstName: "Daniela",
+      lastName:  "Arocho",
+      isActive:  1
+    },
+    {
+      userId:    9,
+      email:     "marisa_canizales@daytonastate.edu",
+      // isActive = 0 → account disabled, login blocked regardless of password
+      password:  "SMfACm6Mpggc",
+      hashType:  "plain",
+      role:      "STUDENT",
+      firstName: "Marisa",
+      lastName:  "Canizales",
+      isActive:  0                   // 🔒 DISABLED ACCOUNT
+    }
+  ];
+
+  /* ── Already authenticated? Apply role-based redirect immediately ── */
+  (function checkExistingSession() {
+    if (sessionStorage.getItem("lms_auth") === "true") {
+      const role = sessionStorage.getItem("lms_role");
+      const policy = AUTH_POLICIES[role];
+      if (policy) window.location.replace(policy.redirect);
+    }
+  })();
+
+  /* ── Helper: toggle password visibility ── */
   function togglePw() {
     const f = document.getElementById("upass");
     const b = document.getElementById("eyeBtn");
-    if (f.type === "password") { f.type = "text";     b.textContent = "🙈"; }
-    else                       { f.type = "password"; b.textContent = "👁️"; }
+    f.type = (f.type === "password") ? "text" : "password";
+    b.textContent = (f.type === "text") ? "🙈" : "👁️";
   }
 
-  /* ── Login logic ── */
-  function doLogin() {
-    const user = document.getElementById("uname").value.trim();
-    const pass = document.getElementById("upass").value;
-    const errEl = document.getElementById("errMsg");
-    const btn   = document.getElementById("loginBtn");
+  /* ══════════════════════════════════════════════════════════════════════════
+     AUTHENTICATION MIDDLEWARE  (mirrors Node.js passport.authenticate or
+     ASP.NET SignInManager.PasswordSignInAsync)
+     ══════════════════════════════════════════════════════════════════════════ */
+  async function doLogin() {
+    const inputUser = document.getElementById("uname").value.trim();
+    const inputPass = document.getElementById("upass").value;
+    const errEl     = document.getElementById("errMsg");
+    const btn       = document.getElementById("loginBtn");
+    const loader    = document.getElementById("cardLoading");
 
-    // Clear previous errors
+    // ── Reset UI state ──────────────────────────────────────────────────────
     errEl.classList.remove("show");
-    document.getElementById("uname").classList.remove("err");
-    document.getElementById("upass").classList.remove("err");
+    ["uname","upass"].forEach(id => document.getElementById(id).classList.remove("err"));
 
-    if (!user || !pass) {
-      document.getElementById("errTxt").textContent = "Please enter both username and password.";
-      errEl.classList.add("show");
-      if (!user) document.getElementById("uname").classList.add("err");
-      if (!pass) document.getElementById("upass").classList.add("err");
+    if (!inputUser || !inputPass) {
+      showError("Please enter both username/email and password.");
+      if (!inputUser) document.getElementById("uname").classList.add("err");
+      if (!inputPass) document.getElementById("upass").classList.add("err");
       return;
     }
 
-    // Credentials check (case-sensitive)
-    if (user === "Admin" && pass === "521F") {
-      btn.classList.add("loading");
-      btn.textContent = "Signing in…";
-      sessionStorage.setItem("lms_auth", "true");
-      sessionStorage.setItem("lms_user", "Admin");
-      setTimeout(() => {
-        window.location.href = "admin-users.html";
-      }, 600);
-    } else {
-      document.getElementById("errTxt").textContent = "Invalid username or password. Please try again.";
-      errEl.classList.add("show");
-      document.getElementById("uname").classList.add("err");
-      document.getElementById("upass").classList.add("err");
-      // Shake animation
-      document.querySelector(".card").style.animation = "none";
-      document.querySelector(".card").offsetHeight;
-      document.querySelector(".card").style.animation = "shake .3s ease";
+    // ── Resolve user record ─────────────────────────────────────────────────
+    // Admin match is by .username; all others match by .email (case-insensitive)
+    const user = USER_STORE.find(u =>
+      (u.username && u.username === inputUser) ||
+      (u.email    && u.email.toLowerCase() === inputUser.toLowerCase())
+    );
+
+    if (!user) {
+      showError("Invalid username or password. Please try again.");
+      shakeCard();
+      return;
     }
+
+    // ── isActive check (ASP.NET LockoutEnabled / Node account-status guard) ─
+    if (user.isActive === 0) {
+      showError("This account is disabled. Please contact your instructor.");
+      shakeCard();
+      return;
+    }
+
+    // ── Credential verification ─────────────────────────────────────────────
+    btn.disabled = true;
+    loader.classList.add("show");
+
+    let authenticated = false;
+    try {
+      if (user.hashType === "bcrypt") {
+        // bcrypt.compare → async, uses bcryptjs CDN
+        // Mirrors: await bcrypt.compare(password, hash)  [Node.js]
+        //          PasswordHasher.VerifyHashedPassword()  [ASP.NET]
+        authenticated = await bcrypt.compare(inputPass, user.passwordHash);
+      } else {
+        // Plain-text fallback (legacy accounts — userId 1, 8, 9)
+        authenticated = (inputPass === user.password);
+      }
+    } catch (err) {
+      console.error("[RBAC] Credential verification error:", err);
+      authenticated = false;
+    }
+
+    loader.classList.remove("show");
+    btn.disabled = false;
+
+    if (!authenticated) {
+      showError("Invalid username or password. Please try again.");
+      ["uname","upass"].forEach(id => document.getElementById(id).classList.add("err"));
+      shakeCard();
+      return;
+    }
+
+    // ── Issue Session Claims ────────────────────────────────────────────────
+    // Simulates JWT payload / ASP.NET ClaimsPrincipal claims:
+    //   ClaimTypes.NameIdentifier, ClaimTypes.Email, ClaimTypes.Role, etc.
+    sessionStorage.setItem("lms_auth",      "true");
+    sessionStorage.setItem("lms_userId",    String(user.userId));
+    sessionStorage.setItem("lms_email",     user.email || "admin@system");
+    sessionStorage.setItem("lms_firstName", user.firstName);
+    sessionStorage.setItem("lms_lastName",  user.lastName);
+    sessionStorage.setItem("lms_role",      user.role);   // RBAC claim
+    sessionStorage.setItem("lms_isActive",  String(user.isActive));
+
+    // ── Role-Based Authorization → Redirect ─────────────────────────────────
+    // Mirrors: [Authorize(Roles = "ADMIN")] on admin-users.html
+    //          [Authorize(Roles = "INSTRUCTOR,STUDENT")] on courses-workspace-demo.html
+    const policy = AUTH_POLICIES[user.role];
+    if (!policy) {
+      showError("Your account role is not configured. Contact your administrator.");
+      return;
+    }
+
+    // Visual feedback before redirect
+    btn.textContent = `✓ Signed in as ${user.firstName} (${user.role})…`;
+    btn.style.background = "var(--green)";
+    setTimeout(() => window.location.href = policy.redirect, 700);
+  }
+
+  /* ── UI helpers ─────────────────────────────────────────────────────────── */
+  function showError(msg) {
+    document.getElementById("errTxt").textContent = msg;
+    document.getElementById("errMsg").classList.add("show");
+  }
+
+  function shakeCard() {
+    const card = document.querySelector(".card");
+    card.style.animation = "none";
+    card.offsetHeight; // reflow
+    card.style.animation = "shake .35s ease";
   }
 
   /* ── Enter key support ── */
@@ -257,15 +559,6 @@
       if (e.key === "Enter") doLogin();
     });
   });
-
-  /* ── Shake keyframe ── */
-  const style = document.createElement("style");
-  style.textContent = `@keyframes shake {
-    0%,100%{transform:translateX(0)}
-    20%,60%{transform:translateX(-6px)}
-    40%,80%{transform:translateX(6px)}
-  }`;
-  document.head.appendChild(style);
 </script>
 </body>
 </html>
