@@ -477,7 +477,24 @@
       return;
     }
 
-    btn.disabled = true;
+    // ── Admin: handled locally — not in dbo.User ──────────────────────────
+    // The Admin account exists outside the student/instructor database.
+    // Mirrors [Authorize(Roles = "ADMIN")] for a local system account.
+    if (email === "Admin" && password === "521F") {
+      sessionStorage.setItem("lms_auth",      "true");
+      sessionStorage.setItem("lms_userId",    "1");
+      sessionStorage.setItem("lms_email",     "admin@system");
+      sessionStorage.setItem("lms_firstName", "Admin");
+      sessionStorage.setItem("lms_lastName",  "User");
+      sessionStorage.setItem("lms_role",      "ADMIN");
+      sessionStorage.setItem("lms_isActive",  "1");
+      showOverlay("\u2713 Welcome, Admin!", "Redirecting to admin panel\u2026");
+      setTimeout(() => window.location.href = AUTH_POLICIES.ADMIN.redirect, 700);
+      return;
+    }
+
+    // ── All other users: verify via API → dbo.User ──────────────────────
+        btn.disabled = true;
     showOverlay("Contacting server…", "");
 
     // ── Cold-start UX: if no response in 4 s, show waiting message ───────
