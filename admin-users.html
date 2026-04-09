@@ -331,6 +331,16 @@
           <div class="pwr"><input class="fc" id="fPw" type="text" placeholder="Auto-generate or enter…" /><button type="button" class="btn btn-out" onclick="genPw()">⟳ Generate</button></div>
           <p class="fhnt">User will be prompted to reset on first login.</p><span class="ferr" id="ePw"></span>
         </div>
+        <!-- Set Password group — shown only in Edit mode -->
+        <div class="fg full" id="setPwGrp" style="display:none">
+          <label>Set New Password <span style="font-weight:400;color:var(--text-sm)">(optional — leave blank to keep current)</span></label>
+          <div class="pwr">
+            <input class="fc" id="fSetPw" type="text" placeholder="Enter new password or leave blank…" />
+            <button type="button" class="btn btn-out" onclick="genSetPw()">⟳ Generate</button>
+          </div>
+          <p class="fhnt">Min. 8 characters. Password is bcrypt-hashed before saving to dbo.User.</p>
+          <span class="ferr" id="eSetPw"></span>
+        </div>
         <div class="fg"><label>Role *</label><select class="fc" id="fRl"><option value="">— Select —</option><option value="STUDENT">Student</option><option value="INSTRUCTOR">Instructor</option><option value="ADMIN">Admin</option></select><span class="ferr" id="eRl"></span></div>
         <div class="fg"><label>Account Status</label><div class="togrow" style="margin-top:6px"><button type="button" class="tog on" id="fAc" onclick="toggleAc()"></button><span class="tlbl" id="tlbl">Active</span></div></div>
       </div>
@@ -754,6 +764,7 @@ function filterLessons(){
 /* ══════════════════════════════════════════════
    USER CRUD
 ══════════════════════════════════════════════ */
+function genSetPw(){const c="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$";let p="";for(let i=0;i<12;i++)p+=c[Math.floor(Math.random()*c.length)];document.getElementById("fSetPw").value=p;}
 function genPw(){const c="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$";let p="";for(let i=0;i<12;i++)p+=c[Math.floor(Math.random()*c.length)];document.getElementById("fPw").value=p;}
 function toggleAc(){isAc=!isAc;document.getElementById("fAc").classList.toggle("on",isAc);document.getElementById("tlbl").textContent=isAc?"Active":"Inactive";}
 function clrUserForm(){["fFn","fLn","fEm","fPw","fRl"].forEach(f=>document.getElementById(f).value="");["eFn","eLn","eEm","ePw","eRl"].forEach(f=>document.getElementById(f).textContent="");["fFn","fLn","fEm","fPw","fRl"].forEach(f=>document.getElementById(f).classList.remove("err"));isAc=true;document.getElementById("fAc").classList.add("on");document.getElementById("tlbl").textContent="Active";}
@@ -766,23 +777,33 @@ function validateUser(){
   if(em&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){document.getElementById("eEm").textContent="Invalid email.";document.getElementById("fEm").classList.add("err");ok=false;}
   return ok;
 }
-function openAddUser(){uEditId=null;clrUserForm();document.getElementById("umTitle").textContent="Add User";document.getElementById("pwGrp").style.display="block";document.getElementById("uSavBtn").textContent="Save User";document.getElementById("uModal").classList.add("open");genPw();}
+function openAddUser(){uEditId=null;clrUserForm();document.getElementById("umTitle").textContent="Add User";document.getElementById("pwGrp").style.display="block";document.getElementById("setPwGrp").style.display="none";document.getElementById("uSavBtn").textContent="Save User";document.getElementById("uModal").classList.add("open");genPw();}
 function openEditUser(id){
   const u=users.find(x=>x.userId===id);if(!u)return;uEditId=id;clrUserForm();
   document.getElementById("fFn").value=u.firstName||"";document.getElementById("fLn").value=u.lastName||"";
   document.getElementById("fEm").value=u.email||"";document.getElementById("fRl").value=u.role||"";
   isAc=!!u.isActive;document.getElementById("fAc").classList.toggle("on",isAc);document.getElementById("tlbl").textContent=isAc?"Active":"Inactive";
-  document.getElementById("pwGrp").style.display="none";document.getElementById("umTitle").textContent="Edit User";document.getElementById("uSavBtn").textContent="Update User";document.getElementById("uModal").classList.add("open");
+  document.getElementById("pwGrp").style.display="none";document.getElementById("setPwGrp").style.display="block";document.getElementById("fSetPw").value="";document.getElementById("umTitle").textContent="Edit User";document.getElementById("uSavBtn").textContent="Update User";document.getElementById("uModal").classList.add("open");
 }
 async function saveUser(){
   if(!validateUser())return;
   const body={firstName:document.getElementById("fFn").value.trim(),lastName:document.getElementById("fLn").value.trim(),email:document.getElementById("fEm").value.trim(),role:document.getElementById("fRl").value,isActive:isAc?1:0};
   if(!uEditId) body.password=document.getElementById("fPw").value.trim();
   try{
-    if(!uEditId){if(demo){body.userId=users.length?Math.max(...users.map(u=>u.userId))+1:1;body.createdAt=new Date().toISOString();users.push(body);}else{users.push(await req("/users","POST",body));}toast("✅ User created!");}
-    else{if(demo){const i=users.findIndex(u=>u.userId===uEditId);if(i>-1)users[i]={...users[i],...body};}else{const u=await req(`/users/${uEditId}`,"PUT",body);const i=users.findIndex(x=>x.userId===uEditId);if(i>-1)users[i]=u;}toast("✏️ User updated!");}
+    if(!uEditId){if(demo){body.userId=users.length?Math.max(...users.map(u=>u.userId))+1:1;body.createdAt=new Date().toISOString();users.push(body);}else{users.push(await req("/users","POST",body));}toast("\u2705 User created!");}
+    else{
+      if(demo){const i=users.findIndex(u=>u.userId===uEditId);if(i>-1)users[i]={...users[i],...body};}
+      else{const u=await req(`/users/${uEditId}`,"PUT",body);const i=users.findIndex(x=>x.userId===uEditId);if(i>-1)users[i]=u;}
+      // Set password if admin entered one
+      const newPw=document.getElementById("fSetPw").value.trim();
+      if(newPw){
+        if(newPw.length<8){document.getElementById("eSetPw").textContent="Password must be at least 8 characters.";document.getElementById("fSetPw").classList.add("err");return;}
+        if(!demo) await req(`/users/${uEditId}/password`,"PATCH",{password:newPw});
+        toast("\u2705 User updated & password set!");
+      } else { toast("\u270f\ufe0f User updated!"); }
+    }
     closeMod("uModal");renderUsers();
-  }catch(e){toast("❌ "+e.message,"err");}
+  }catch(e){toast("\u274c "+e.message,"err");}
 }
 function openDelUser(id){const u=users.find(x=>x.userId===id);delTarget={type:"user",id,label:u?`${u.firstName} ${u.lastName} (${u.email})`:`User #${id}`};document.getElementById("dName").textContent=delTarget.label;document.getElementById("dModal").classList.add("open");}
 

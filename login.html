@@ -256,14 +256,56 @@
     .btn-modal:disabled { opacity: .6; cursor: not-allowed; }
     .btn-modal.success { background: var(--green); }
 
-    /* Forgot link under login button */
-    .forgot-link {
-      display: block; text-align: center; margin-top: 14px;
+
+    /* ── Request Password Reset ────────────────────────────────────── */
+    .req-reset-link {
+      display: none; text-align: center; margin-top: 14px;
       font-size: 12px; color: var(--text-sm); cursor: pointer;
       text-decoration: underline; background: none; border: none;
       font-family: inherit; width: 100%;
     }
-    .forgot-link:hover { color: var(--text); }
+    .req-reset-link:hover { color: var(--text); }
+
+    .reset-modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 100;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .reset-modal-backdrop.show { display: flex; }
+    .reset-modal {
+      background: #fff; border-radius: 10px; width: 100%; max-width: 380px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.25); overflow: hidden;
+      animation: modalIn .2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform:translateY(-12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .reset-modal-hdr {
+      background: var(--navy); padding: 14px 18px;
+      border-bottom: 2px solid var(--amber);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .reset-modal-hdr h3 { font-size: 14px; font-weight: 700; color: #fff; margin: 0; }
+    .reset-modal-close {
+      background: none; border: none; color: rgba(255,255,255,.7);
+      font-size: 20px; cursor: pointer; line-height: 1; padding: 0;
+    }
+    .reset-modal-close:hover { color: #fff; }
+    .reset-modal-body { padding: 22px 20px; }
+    .reset-modal-body p { font-size: 13px; color: var(--text-md); line-height: 1.6; margin-bottom: 14px; }
+    .reset-modal-body .contact-box {
+      background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px;
+      padding: 12px 14px; font-size: 12.5px; color: #0369a1; font-weight: 600;
+      margin-bottom: 18px;
+    }
+    .btn-close-reset {
+      width: 100%; padding: 10px; border-radius: 5px;
+      background: var(--navy); color: #fff;
+      font-family: inherit; font-size: 13.5px; font-weight: 700;
+      border: none; cursor: pointer; transition: background .15s;
+    }
+    .btn-close-reset:hover { background: var(--navy-dk); }
   </style>
 </head>
 <body>
@@ -332,10 +374,6 @@
           Sign In →
         </button>
 
-        <button type="button" class="forgot-link" id="forgotLink"
-                style="display:none" onclick="openForgotModal()">
-          Forgot your password?
-        </button>
 
       </div>
     </div>
@@ -404,6 +442,24 @@
           </button>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Password Reset Request Modal ────────────────────────────────── -->
+  <div class="reset-modal-backdrop" id="resetRequestBackdrop">
+    <div class="reset-modal" role="dialog" aria-modal="true">
+      <div class="reset-modal-hdr">
+        <h3>Password Reset Request</h3>
+        <button class="reset-modal-close" onclick="closeResetRequestModal()">&times;</button>
+      </div>
+      <div class="reset-modal-body">
+        <p>To reset your password, please contact your course instructor or system administrator. They can set a new password for your account directly from the admin panel.</p>
+        <div class="contact-box">
+          📧 Contact: <a href="mailto:jose_melendez4701@daytonastate.edu"
+             style="color:inherit">jose_melendez4701@daytonastate.edu</a>
+        </div>
+        <button class="btn-close-reset" onclick="closeResetRequestModal()">Got it</button>
       </div>
     </div>
   </div>
@@ -599,9 +655,9 @@
   function showError(msg) {
     document.getElementById("errTxt").textContent = msg;
     document.getElementById("errMsg").classList.add("show");
-    // Reveal "Forgot your password?" after the first failed attempt
-    const fl = document.getElementById("forgotLink");
-    if (fl) fl.style.display = "block";
+    // Show 'Request password reset' after first failed attempt
+    const lnk = document.getElementById("reqResetLink");
+    if (lnk) lnk.style.display = "block";
   }
   function clearErrors() {
     document.getElementById("errMsg").classList.remove("show");
@@ -620,224 +676,20 @@
       if (e.key === "Enter") doLogin();
     })
   );
-
-  /* ════════════════════════════════════════════════════════════════════════
-     FORGOT / RESET PASSWORD MODAL
-     ════════════════════════════════════════════════════════════════════════ */
-
-  const API_BASE = "https://daytona-lms-api.onrender.com";
-
-  /* ── On page load: check for ?token= in URL ────────────────────────────
-     If present, the user clicked a reset link from their email.
-     Auto-open the modal on Panel 2 so they can set a new password.     */
-  (function checkResetToken() {
-    const params = new URLSearchParams(window.location.search);
-    const token  = params.get("token");
-    if (token) {
-      window._resetToken = token;
-      // Clean token from URL bar without page reload
-      history.replaceState({}, "", window.location.pathname);
-      openResetPanel();
-    }
-  })();
-
-  /* ── Modal open/close ── */
-  function openForgotModal() {
-    clearModalMessages();
-    showPanel("panelForgot");
-    document.getElementById("modalBackdrop").classList.add("show");
-    setTimeout(() => document.getElementById("resetEmail").focus(), 100);
-  }
-
-  function openResetPanel() {
-    clearModalMessages();
-    showPanel("panelReset");
-    document.getElementById("modalBackdrop").classList.add("show");
-    setTimeout(() => document.getElementById("newPass").focus(), 100);
-  }
-
-  function closeModal() {
-    document.getElementById("modalBackdrop").classList.remove("show");
-    clearModalMessages();
-    // Clear fields
-    ["resetEmail","newPass","confirmPass"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
-    });
-    document.getElementById("strengthBar").style.width = "0%";
-    document.getElementById("strengthLabel").textContent = "";
-  }
-
-  // Close on backdrop click
-  document.getElementById("modalBackdrop").addEventListener("click", function(e) {
-    if (e.target === this) closeModal();
-  });
-
-  // Close on Escape key
-  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
-
-  function showPanel(id) {
-    ["panelForgot","panelReset"].forEach(p => {
-      document.getElementById(p).classList.toggle("active", p === id);
-    });
-  }
-
-  function clearModalMessages() {
-    document.getElementById("modalInfo").classList.remove("show");
-    document.getElementById("modalErr").classList.remove("show");
-    document.getElementById("resetEmail") &&
-      document.getElementById("resetEmail").classList.remove("err");
-    document.getElementById("newPass") &&
-      document.getElementById("newPass").classList.remove("err");
-    document.getElementById("confirmPass") &&
-      document.getElementById("confirmPass").classList.remove("err");
-  }
-
-  function showModalInfo(msg) {
-    document.getElementById("modalInfoTxt").textContent = msg;
-    document.getElementById("modalInfo").classList.add("show");
-    document.getElementById("modalErr").classList.remove("show");
-  }
-
-  function showModalErr(msg) {
-    document.getElementById("modalErrTxt").textContent = msg;
-    document.getElementById("modalErr").classList.add("show");
-    document.getElementById("modalInfo").classList.remove("show");
-  }
-
-  /* ── Panel 1: Send reset link ───────────────────────────────────────────
-     POST /api/forgot-password { email }
-     Server looks up email in dbo.User, generates token, sends email.   */
-  async function sendResetLink() {
-    const email = document.getElementById("resetEmail").value.trim();
-    const btn   = document.getElementById("btnSendLink");
-    clearModalMessages();
-
-    if (!email) {
-      document.getElementById("resetEmail").classList.add("err");
-      showModalErr("Please enter your email address.");
-      return;
-    }
-
-    btn.disabled    = true;
-    btn.textContent = "Sending…";
-
-    try {
-      const res  = await fetch(`${API_BASE}/api/forgot-password`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ email })
-      });
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || "Request failed.");
-
-      // Always show success — server never reveals if email exists
-      btn.textContent = "Sent ✓";
-      btn.classList.add("success");
-      showModalInfo("Check your .edu inbox — a reset link is on its way. It expires in 1 hour.");
-
-    } catch (err) {
-      btn.disabled    = false;
-      btn.textContent = "Send Reset Link →";
-      showModalErr(err.message || "Could not send reset email. Please try again.");
-    }
-  }
-
-  /* ── Panel 2: Submit new password ──────────────────────────────────────
-     POST /api/reset-password { token, newPassword }
-     Server verifies token, bcrypt-hashes, updates dbo.User.passwordHash. */
-  async function submitNewPassword() {
-    const newPass  = document.getElementById("newPass").value;
-    const confirm  = document.getElementById("confirmPass").value;
-    const btn      = document.getElementById("btnSetPass");
-    const token    = window._resetToken;
-    clearModalMessages();
-
-    if (!token) {
-      showModalErr("Reset token is missing. Please use the link from your email.");
-      return;
-    }
-    if (newPass.length < 8) {
-      document.getElementById("newPass").classList.add("err");
-      showModalErr("Password must be at least 8 characters.");
-      return;
-    }
-    if (newPass !== confirm) {
-      document.getElementById("confirmPass").classList.add("err");
-      showModalErr("Passwords do not match.");
-      return;
-    }
-
-    btn.disabled    = true;
-    btn.textContent = "Updating…";
-
-    try {
-      const res  = await fetch(`${API_BASE}/api/reset-password`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ token, newPassword: newPass })
-      });
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || "Reset failed.");
-
-      // Success — show confirmation then close modal after 2.5 s
-      btn.textContent = "Password Updated ✓";
-      btn.classList.add("success");
-      window._resetToken = null;
-      showModalInfo("Password updated! You can now sign in with your new password.");
-      setTimeout(() => closeModal(), 2500);
-
-    } catch (err) {
-      btn.disabled    = false;
-      btn.textContent = "Set New Password →";
-      showModalErr(err.message || "Failed to reset password. The link may have expired.");
-    }
-  }
-
-  /* ── Password strength indicator ────────────────────────────────────── */
-  function checkStrength(val) {
-    const bar   = document.getElementById("strengthBar");
-    const label = document.getElementById("strengthLabel");
-    let score = 0;
-    if (val.length >= 8)  score++;
-    if (val.length >= 12) score++;
-    if (/[A-Z]/.test(val)) score++;
-    if (/[0-9]/.test(val)) score++;
-    if (/[^A-Za-z0-9]/.test(val)) score++;
-    const levels = [
-      { w:"0%",   bg:"",          txt:"" },
-      { w:"25%",  bg:"#ef4444",   txt:"Weak" },
-      { w:"50%",  bg:"#f97316",   txt:"Fair" },
-      { w:"75%",  bg:"#eab308",   txt:"Good" },
-      { w:"90%",  bg:"#22c55e",   txt:"Strong" },
-      { w:"100%", bg:"#16a34a",   txt:"Very strong" },
-    ];
-    const lvl = levels[Math.min(score, 5)];
-    bar.style.width      = lvl.w;
-    bar.style.background = lvl.bg;
-    label.textContent    = lvl.txt;
-    label.style.color    = lvl.bg;
-  }
-
-  /* ── Toggle visibility for new/confirm password fields ── */
-  function togglePw2() {
-    const f = document.getElementById("newPass");
-    f.type = (f.type === "password") ? "text" : "password";
-  }
-  function togglePw3() {
-    const f = document.getElementById("confirmPass");
-    f.type = (f.type === "password") ? "text" : "password";
-  }
-
-  /* ── Enter key in modal fields ── */
-  document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("resetEmail")
-      .addEventListener("keydown", e => { if (e.key === "Enter") sendResetLink(); });
-    document.getElementById("confirmPass")
-      .addEventListener("keydown", e => { if (e.key === "Enter") submitNewPassword(); });
-  });
-</script>
 </body>
 </html>
+  /* ── Password Reset Request Modal ── */
+  function openResetRequestModal() {
+    document.getElementById("resetRequestBackdrop").classList.add("show");
+  }
+  function closeResetRequestModal() {
+    document.getElementById("resetRequestBackdrop").classList.remove("show");
+  }
+  document.getElementById("resetRequestBackdrop").addEventListener("click", function(e) {
+    if (e.target === this) closeResetRequestModal();
+  });
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeResetRequestModal();
+  });
+
+
