@@ -3,49 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login | Web Systems II – Admin</title>
+  <title>Login | Web Systems II</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <!--
   ╔══════════════════════════════════════════════════════════════════════════╗
-  ║  ROLE-BASED ACCESS CONTROL  –  Node.js / ASP.NET RBAC Pattern           ║
-  ║  ─────────────────────────────────────────────────────────────────────  ║
-  ║  Mirrors the RBAC middleware pattern used in:                            ║
-  ║    • ASP.NET Core  → [Authorize(Roles = "ADMIN|INSTRUCTOR|STUDENT")]     ║
-  ║    • Node.js/Express → requireRole('ADMIN') middleware                   ║
+  ║  ROLE-BASED ACCESS CONTROL  –  Node.js RBAC Pattern                     ║
+  ║  Backend : https://daytona-lms-api.onrender.com                         ║
+  ║  Database: SQL Server · daytona_lms · dbo.User (read-only)              ║
   ║                                                                          ║
-  ║  Session Claims stored in sessionStorage (simulates JWT payload):        ║
-  ║    lms_auth      – "true" when authenticated                             ║
-  ║    lms_userId    – numeric user ID from DB                               ║
-  ║    lms_email     – user's email                                          ║
-  ║    lms_firstName – given name                                            ║
-  ║    lms_lastName  – family name                                           ║
-  ║    lms_role      – ADMIN | INSTRUCTOR | STUDENT                          ║
-  ║    lms_isActive  – 1 | 0                                                 ║
+  ║  POST /api/login  { email, password }                                    ║
+  ║    → 200  { userId, email, firstName, lastName, role, isActive }         ║
+  ║    → 401  { error: "..." }                                               ║
   ║                                                                          ║
-  ║  Routing (Authorization Policy):                                         ║
-  ║    ADMIN       → admin-users.html                                        ║
-  ║    INSTRUCTOR  → courses-workspace-demo.html  (GitHub Pages)             ║
-  ║    STUDENT     → courses-workspace-demo.html  (GitHub Pages)             ║
+  ║  Authorization Policy (role → redirect):                                 ║
+  ║    ADMIN      → admin-users.html                                         ║
+  ║    INSTRUCTOR → courses-workspace-demo.html  (GitHub Pages)              ║
+  ║    STUDENT    → courses-workspace-demo.html  (GitHub Pages)              ║
   ╚══════════════════════════════════════════════════════════════════════════╝
   -->
-
-  <!-- bcryptjs CDN – enables client-side bcrypt hash verification -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"
-          integrity="sha512-V7KlCt3Dydx2YFp0B8OsM0q/Q0XnqPCqFhE+f7Y7KTxz4N4V0jhWz4vWuoNKC8H28oNePqU1lxW9fzewHFGA=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --navy:    #1a2d4a;
       --navy-dk: #142238;
-      --navy-lt: #243a5e;
       --amber:   #e8a020;
-      --teal:    #0e7569;
-      --blue:    #2563eb;
       --red:     #dc2626;
       --green:   #16a34a;
+      --orange:  #ea580c;
       --border:  #e5e7eb;
       --bg:      #f0f2f5;
       --text:    #111827;
@@ -61,7 +46,6 @@
       flex-direction: column;
     }
 
-    /* HEADER */
     header {
       height: 52px;
       background: var(--navy);
@@ -77,15 +61,12 @@
     .htitle strong { display: block; font-size: 13.5px; font-weight: 700; color: #fff; }
     .htitle span   { display: block; font-size: 11px; color: #a8bcce; }
 
-    /* MAIN */
     main {
       flex: 1; display: flex; align-items: center; justify-content: center;
       padding: 40px 16px;
     }
-
     .login-wrap { width: 100%; max-width: 420px; }
 
-    /* Welcome block */
     .welcome { text-align: center; margin-bottom: 28px; }
     .welcome-icon {
       width: 64px; height: 64px; border-radius: 16px;
@@ -97,13 +78,8 @@
     .welcome h1 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
     .welcome p  { font-size: 13.5px; color: var(--text-sm); }
 
-    /* Role Pills */
-    .role-pills {
-      display: flex; justify-content: center; gap: 8px;
-      margin-top: 12px; flex-wrap: wrap;
-    }
+    .role-pills { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
     .role-pill {
-      display: inline-flex; align-items: center; gap: 5px;
       padding: 3px 10px; border-radius: 99px;
       font-size: 11px; font-weight: 700; border: 1.5px solid;
     }
@@ -115,6 +91,7 @@
     .card {
       background: #fff; border: 1px solid var(--border); border-radius: 8px;
       overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.08);
+      position: relative;
     }
     .card-hdr {
       background: var(--navy); padding: 14px 22px;
@@ -124,22 +101,49 @@
     .card-hdr p  { font-size: 12px; color: #a8bcce; margin-top: 2px; }
     .card-body { padding: 24px 22px; }
 
-    /* Role hint */
-    .login-hint {
-      background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 5px;
-      padding: 8px 12px; font-size: 11.5px; color: #0369a1;
-      margin-bottom: 16px;
+    /* Loading / cold-start overlay */
+    .card-overlay {
+      display: none; position: absolute; inset: 0;
+      background: rgba(255,255,255,.95); border-radius: 8px;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+      z-index: 10; padding: 28px; text-align: center;
     }
-    .login-hint strong { font-weight: 700; }
+    .card-overlay.show { display: flex; }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #e5e7eb;
+      border-top-color: var(--navy);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .overlay-msg { font-size: 14px; font-weight: 700; color: var(--navy); }
+    .overlay-sub { font-size: 12px; color: var(--text-sm); line-height: 1.6; white-space: pre-line; }
+
+    /* Cold-start progress bar */
+    .cold-bar-wrap {
+      width: 100%; background: #f3f4f6; border-radius: 99px;
+      height: 5px; overflow: hidden; display: none; margin-top: 4px;
+    }
+    .cold-bar-wrap.show { display: block; }
+    .cold-bar {
+      height: 100%; background: var(--orange); border-radius: 99px;
+      width: 0%; transition: width .5s linear;
+    }
 
     /* Form */
+    .login-hint {
+      background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 5px;
+      padding: 8px 12px; font-size: 11.5px; color: #0369a1; margin-bottom: 16px;
+    }
     .fg { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
-    .fg:last-of-type { margin-bottom: 22px; }
     label { font-size: 12px; font-weight: 700; color: var(--text-md); }
     .fc {
       padding: 10px 12px; border: 1px solid var(--border); border-radius: 5px;
-      font-family: inherit; font-size: 13.5px; transition: border-color .15s;
-      width: 100%;
+      font-family: inherit; font-size: 13.5px; transition: border-color .15s; width: 100%;
     }
     .fc:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
     .fc.err { border-color: var(--red); }
@@ -151,7 +155,6 @@
       background: none; border: none; cursor: pointer;
       font-size: 16px; color: var(--text-sm); padding: 0; line-height: 1;
     }
-    .pw-eye:hover { color: var(--text); }
 
     .err-msg {
       background: #fef2f2; border: 1px solid #fecaca; border-radius: 5px;
@@ -161,25 +164,6 @@
     }
     .err-msg.show { display: flex; }
 
-    /* Loading overlay on card */
-    .card-loading {
-      display: none; position: absolute; inset: 0;
-      background: rgba(255,255,255,.85); border-radius: 8px;
-      align-items: center; justify-content: center;
-      flex-direction: column; gap: 10px; font-size: 13px;
-      color: var(--navy); font-weight: 600;
-      z-index: 10;
-    }
-    .card-loading.show { display: flex; }
-    .card { position: relative; }
-
-    .spinner {
-      width: 32px; height: 32px; border: 3px solid #e5e7eb;
-      border-top-color: var(--navy); border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
     .btn-login {
       width: 100%; padding: 11px; border-radius: 5px;
       background: var(--navy); color: #fff;
@@ -187,26 +171,111 @@
       border: none; cursor: pointer; transition: background .15s;
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .btn-login:hover { background: var(--navy-dk); }
-    .btn-login:active { opacity: .9; }
+    .btn-login:hover:not(:disabled) { background: var(--navy-dk); }
     .btn-login:disabled { opacity: .6; cursor: not-allowed; }
 
-    /* Footer */
     footer {
       text-align: center; padding: 16px;
       font-size: 11.5px; color: var(--text-sm);
     }
 
     @keyframes shake {
-      0%,100%{ transform: translateX(0) }
-      20%,60%{ transform: translateX(-6px) }
-      40%,80%{ transform: translateX(6px) }
+      0%,100%{ transform:translateX(0) }
+      20%,60%{ transform:translateX(-6px) }
+      40%,80%{ transform:translateX(6px) }
     }
+
+    /* ── Forgot Password Modal ─────────────────────────────────────── */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 100;
+      align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.show { display: flex; }
+
+    .modal {
+      background: #fff; border-radius: 10px; width: 100%; max-width: 400px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.25); overflow: hidden;
+      animation: modalIn .2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform: translateY(-16px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .modal-hdr {
+      background: var(--navy); padding: 14px 18px;
+      border-bottom: 2px solid var(--amber);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-hdr h3 { font-size: 14px; font-weight: 700; color: #fff; margin: 0; }
+    .modal-close {
+      background: none; border: none; color: rgba(255,255,255,.7);
+      font-size: 20px; cursor: pointer; line-height: 1; padding: 0;
+    }
+    .modal-close:hover { color: #fff; }
+    .modal-body { padding: 22px 20px; }
+
+    /* Two-panel switcher */
+    .modal-panel { display: none; }
+    .modal-panel.active { display: block; }
+
+    .modal-desc {
+      font-size: 13px; color: var(--text-sm);
+      margin-bottom: 18px; line-height: 1.5;
+    }
+    .modal-fg { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .modal-label { font-size: 12px; font-weight: 700; color: var(--text-md); }
+
+    .pw-strength {
+      height: 4px; border-radius: 99px; background: #e5e7eb;
+      overflow: hidden; margin-top: 6px;
+    }
+    .pw-strength-bar {
+      height: 100%; border-radius: 99px; width: 0%;
+      transition: width .3s, background .3s;
+    }
+    .pw-strength-label {
+      font-size: 10.5px; margin-top: 4px; font-weight: 600;
+    }
+
+    .modal-info {
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 5px;
+      padding: 10px 12px; font-size: 12.5px; color: #15803d;
+      font-weight: 600; display: none; margin-bottom: 14px;
+      align-items: center; gap: 8px;
+    }
+    .modal-info.show { display: flex; }
+    .modal-err {
+      background: #fef2f2; border: 1px solid #fecaca; border-radius: 5px;
+      padding: 10px 12px; font-size: 12.5px; color: var(--red);
+      font-weight: 600; display: none; margin-bottom: 14px;
+      align-items: center; gap: 8px;
+    }
+    .modal-err.show { display: flex; }
+
+    .btn-modal {
+      width: 100%; padding: 10px; border-radius: 5px;
+      background: var(--navy); color: #fff;
+      font-family: inherit; font-size: 13.5px; font-weight: 700;
+      border: none; cursor: pointer; transition: background .15s;
+    }
+    .btn-modal:hover:not(:disabled) { background: var(--navy-dk); }
+    .btn-modal:disabled { opacity: .6; cursor: not-allowed; }
+    .btn-modal.success { background: var(--green); }
+
+    /* Forgot link under login button */
+    .forgot-link {
+      display: block; text-align: center; margin-top: 14px;
+      font-size: 12px; color: var(--text-sm); cursor: pointer;
+      text-decoration: underline; background: none; border: none;
+      font-family: inherit; width: 100%;
+    }
+    .forgot-link:hover { color: var(--text); }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header>
   <div class="hicon">🎓</div>
   <div class="htitle">
@@ -215,7 +284,6 @@
   </div>
 </header>
 
-<!-- MAIN -->
 <main>
   <div class="login-wrap">
 
@@ -223,7 +291,6 @@
       <div class="welcome-icon">🔐</div>
       <h1>LMS Portal</h1>
       <p>Sign in to access your course workspace.</p>
-      <!-- Role indicators — mirrors ASP.NET [Authorize(Roles="...")] visual cue -->
       <div class="role-pills">
         <span class="role-pill admin">⚙️ Admin</span>
         <span class="role-pill instructor">🏫 Instructor</span>
@@ -233,10 +300,14 @@
 
     <div class="card">
 
-      <!-- Loading overlay (shown while bcrypt.compare runs) -->
-      <div class="card-loading" id="cardLoading">
+      <!-- Loading / cold-start overlay -->
+      <div class="card-overlay" id="cardOverlay">
         <div class="spinner"></div>
-        <span>Verifying credentials…</span>
+        <div class="overlay-msg" id="overlayMsg">Verifying credentials…</div>
+        <div class="cold-bar-wrap" id="coldBarWrap">
+          <div class="cold-bar" id="coldBar"></div>
+        </div>
+        <div class="overlay-sub" id="overlaySub"></div>
       </div>
 
       <div class="card-hdr">
@@ -246,22 +317,21 @@
       <div class="card-body">
 
         <div class="login-hint">
-          <strong>Admin:</strong> use username <em>Admin</em> &nbsp;|&nbsp;
-          <strong>Instructor / Students:</strong> use your <em>@daytona(state).edu</em> email
+          Use your <strong>@daytona(state).edu</strong> email and your account password.
         </div>
 
         <div class="err-msg" id="errMsg">
-          ⚠️ <span id="errTxt">Invalid username or password.</span>
+          ⚠️ <span id="errTxt"></span>
         </div>
 
         <div class="fg">
-          <label for="uname">Username / Email</label>
-          <input class="fc" id="uname" type="text"
-                 placeholder="Admin  –or–  you@daytonastate.edu"
+          <label for="uname">Email Address</label>
+          <input class="fc" id="uname" type="email"
+                 placeholder="you@daytonastate.edu"
                  autocomplete="username" />
         </div>
 
-        <div class="fg">
+        <div class="fg" style="margin-bottom:22px">
           <label for="upass">Password</label>
           <div class="pw-wrap">
             <input class="fc" id="upass" type="password"
@@ -279,6 +349,72 @@
     </div>
 
   </div>
+
+  <!-- ── Forgot / Reset Password Modal ─────────────────────────────────
+       Panel 1 (#panelForgot): user enters email → POST /api/forgot-password
+       Panel 2 (#panelReset) : auto-shown when ?token= in URL → POST /api/reset-password
+       ──────────────────────────────────────────────────────────────── -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-hdr">
+        <h3 id="modalTitle">Reset Password</h3>
+        <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Success / Error banners (shared) -->
+        <div class="modal-info" id="modalInfo">✅ <span id="modalInfoTxt"></span></div>
+        <div class="modal-err"  id="modalErr" >⚠️ <span id="modalErrTxt"></span></div>
+
+        <!-- Panel 1 — Request reset link -->
+        <div class="modal-panel active" id="panelForgot">
+          <p class="modal-desc">
+            Enter your <strong>.edu email address</strong> and we'll send you a
+            link to reset your password. The link expires in <strong>1 hour</strong>.
+          </p>
+          <div class="modal-fg">
+            <label class="modal-label" for="resetEmail">Email Address</label>
+            <input class="fc" id="resetEmail" type="email"
+                   placeholder="you@daytonastate.edu" autocomplete="email" />
+          </div>
+          <button class="btn-modal" id="btnSendLink" onclick="sendResetLink()">
+            Send Reset Link →
+          </button>
+        </div>
+
+        <!-- Panel 2 — Set new password (shown when ?token= in URL) -->
+        <div class="modal-panel" id="panelReset">
+          <p class="modal-desc">
+            Choose a new password for your account.
+            It must be at least <strong>8 characters</strong>.
+          </p>
+          <div class="modal-fg">
+            <label class="modal-label" for="newPass">New Password</label>
+            <div class="pw-wrap">
+              <input class="fc" id="newPass" type="password"
+                     placeholder="Min. 8 characters"
+                     oninput="checkStrength(this.value)" />
+              <button type="button" class="pw-eye" onclick="togglePw2()">👁️</button>
+            </div>
+            <div class="pw-strength"><div class="pw-strength-bar" id="strengthBar"></div></div>
+            <div class="pw-strength-label" id="strengthLabel"></div>
+          </div>
+          <div class="modal-fg" style="margin-bottom:18px">
+            <label class="modal-label" for="confirmPass">Confirm Password</label>
+            <div class="pw-wrap">
+              <input class="fc" id="confirmPass" type="password"
+                     placeholder="Repeat new password" />
+              <button type="button" class="pw-eye" onclick="togglePw3()">👁️</button>
+            </div>
+          </div>
+          <button class="btn-modal" id="btnSetPass" onclick="submitNewPassword()">
+            Set New Password →
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </main>
 
 <footer>
@@ -286,278 +422,409 @@
 </footer>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════════════════
-   RBAC CONFIGURATION
-   ─────────────────────────────────────────────────────────────────────────
-   Pattern mirrors:
-     ASP.NET Core  → services.AddAuthorization(o => o.AddPolicy(...))
-     Node/Express  → const rbac = new RBAC({ roles: [...], permissions: [...] })
+  /* ════════════════════════════════════════════════════════════════════════
+     RBAC CONFIGURATION
+     ════════════════════════════════════════════════════════════════════════ */
 
-   Roles defined:
-     ADMIN       – Full system access → admin-users.html
-     INSTRUCTOR  – Course management → courses-workspace-demo.html
-     STUDENT     – Course view/interact → courses-workspace-demo.html
-   ═══════════════════════════════════════════════════════════════════════════ */
+  // 🔧 Update this path if your login route differs (e.g. /auth/login)
+  const API_LOGIN_URL = "https://daytona-lms-api.onrender.com/api/login";
 
-  // ── Authorization Policies (mirrors ASP.NET AddPolicy / Node rbac config) ──
+  // Render free tier cold-start: show "waking up" UX after 4 s, abort at 70 s
+  const COLD_START_THRESHOLD_MS = 4000;
+  const HARD_TIMEOUT_MS         = 70000;
+
+  // Authorization Policy: role → destination URL
   const AUTH_POLICIES = {
     ADMIN:      { redirect: "admin-users.html" },
     INSTRUCTOR: { redirect: "https://melendja.github.io/WebII_CoursesDemo/courses-workspace-demo.html" },
     STUDENT:    { redirect: "https://melendja.github.io/WebII_CoursesDemo/courses-workspace-demo.html" }
   };
 
-  // ── In-memory User Store ──────────────────────────────────────────────────
-  // Mirrors the DB schema: users(userId, email, passwordHash, role, firstName, lastName, isActive)
-  //
-  // ⚠️  PASSWORD HASHES: The hashes below are truncated in this demo because
-  //     the DB screenshot only showed partial values.  Replace each hash with
-  //     the FULL bcrypt hash string from your SQLite/SQL Server database.
-  //     bcrypt hashes are exactly 60 characters and begin with "$2b$12$..."
-  //
-  // NOTE: Two accounts (userId 8, 9) appear to use NON-bcrypt storage.
-  //       userId 8 → plain-text comparison applied automatically
-  //       userId 9 → isActive = 0, account is DISABLED regardless of password
-  //
-  const USER_STORE = [
-    // ── ADMIN (local account, no DB row) ────────────────────────────────────
-    {
-      userId:    1,
-      email:     null,               // Admin uses username, not email
-      username:  "Admin",            // [Authorize(Roles = "ADMIN")]
-      password:  "521F",             // plain-text (admin-only exception)
-      hashType:  "plain",
-      role:      "ADMIN",
-      firstName: "Admin",
-      lastName:  "User",
-      isActive:  1
-    },
-
-    // ── INSTRUCTOR ───────────────────────────────────────────────────────────
-    {
-      userId:    2,
-      email:     "instructor@daytona.edu",
-      // 🔴 REPLACE with full 60-char hash from DB → SELECT passwordHash FROM users WHERE userId=2
-      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_2",
-      hashType:  "bcrypt",
-      role:      "INSTRUCTOR",
-      firstName: "Ronald",
-      lastName:  "Eaglin",
-      isActive:  1
-    },
-
-    // ── STUDENTS ─────────────────────────────────────────────────────────────
-    {
-      userId:    3,
-      email:     "aram_anderson@daytonastate.edu",
-      // 🔴 REPLACE → SELECT passwordHash FROM users WHERE userId=3
-      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_3",
-      hashType:  "bcrypt",
-      role:      "STUDENT",
-      firstName: "Aram",
-      lastName:  "Anderson",
-      isActive:  1
-    },
-    {
-      userId:    4,
-      email:     "kae_bauder@daytonastate.edu",
-      // 🔴 REPLACE → SELECT passwordHash FROM users WHERE userId=4
-      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_4",
-      hashType:  "bcrypt",
-      role:      "STUDENT",
-      firstName: "Kae",
-      lastName:  "Bauder",
-      isActive:  1
-    },
-    {
-      userId:    5,
-      email:     "john_bellino@daytonastate.edu",
-      // 🔴 REPLACE → SELECT passwordHash FROM users WHERE userId=5
-      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_5",
-      hashType:  "bcrypt",
-      role:      "STUDENT",
-      firstName: "John",
-      lastName:  "Bellino",
-      isActive:  1
-    },
-    {
-      userId:    6,
-      email:     "jeremiah_buckley-williams@daytonastate.edu",
-      // 🔴 REPLACE → SELECT passwordHash FROM users WHERE userId=6
-      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_6",
-      hashType:  "bcrypt",
-      role:      "STUDENT",
-      firstName: "Jeremiah",
-      lastName:  "Buckley-Williams",
-      isActive:  1
-    },
-    {
-      userId:    7,
-      email:     "jose_melendez4701@daytonastate.edu",
-      // 🔴 REPLACE → SELECT passwordHash FROM users WHERE userId=7
-      passwordHash: "$2b$12$REPLACE_WITH_FULL_HASH_FROM_YOUR_DATABASE_userId_7",
-      hashType:  "bcrypt",
-      role:      "STUDENT",
-      firstName: "Jose A.",
-      lastName:  "Melendez",
-      isActive:  1
-    },
-    {
-      userId:    8,
-      email:     "daniela_arocho@daytonastate.edu",
-      // Non-bcrypt: stored as plaintext in DB → plain comparison used
-      password:  "C6ce4RRxPc4",
-      hashType:  "plain",
-      role:      "STUDENT",
-      firstName: "Daniela",
-      lastName:  "Arocho",
-      isActive:  1
-    },
-    {
-      userId:    9,
-      email:     "marisa_canizales@daytonastate.edu",
-      // isActive = 0 → account disabled, login blocked regardless of password
-      password:  "SMfACm6Mpggc",
-      hashType:  "plain",
-      role:      "STUDENT",
-      firstName: "Marisa",
-      lastName:  "Canizales",
-      isActive:  0                   // 🔒 DISABLED ACCOUNT
-    }
-  ];
-
-  /* ── Already authenticated? Apply role-based redirect immediately ── */
+  /* ── Already authenticated? Apply role-based redirect immediately ─────── */
   (function checkExistingSession() {
     if (sessionStorage.getItem("lms_auth") === "true") {
-      const role = sessionStorage.getItem("lms_role");
-      const policy = AUTH_POLICIES[role];
+      const policy = AUTH_POLICIES[sessionStorage.getItem("lms_role")];
       if (policy) window.location.replace(policy.redirect);
     }
   })();
 
-  /* ── Helper: toggle password visibility ── */
+  /* ── Password visibility toggle ── */
   function togglePw() {
     const f = document.getElementById("upass");
     const b = document.getElementById("eyeBtn");
-    f.type = (f.type === "password") ? "text" : "password";
+    f.type        = (f.type === "password") ? "text" : "password";
     b.textContent = (f.type === "text") ? "🙈" : "👁️";
   }
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     AUTHENTICATION MIDDLEWARE  (mirrors Node.js passport.authenticate or
-     ASP.NET SignInManager.PasswordSignInAsync)
-     ══════════════════════════════════════════════════════════════════════════ */
+  /* ════════════════════════════════════════════════════════════════════════
+     doLogin()
+     — POST { email, password } to daytona-lms-api
+     — API queries dbo.User, runs bcrypt.compare() server-side
+     — On success: write session claims, redirect by role
+     — Handles Render free-tier cold starts gracefully
+     ════════════════════════════════════════════════════════════════════════ */
   async function doLogin() {
-    const inputUser = document.getElementById("uname").value.trim();
-    const inputPass = document.getElementById("upass").value;
-    const errEl     = document.getElementById("errMsg");
-    const btn       = document.getElementById("loginBtn");
-    const loader    = document.getElementById("cardLoading");
+    const email    = document.getElementById("uname").value.trim();
+    const password = document.getElementById("upass").value;
+    const btn      = document.getElementById("loginBtn");
 
-    // ── Reset UI state ──────────────────────────────────────────────────────
-    errEl.classList.remove("show");
-    ["uname","upass"].forEach(id => document.getElementById(id).classList.remove("err"));
+    clearErrors();
 
-    if (!inputUser || !inputPass) {
-      showError("Please enter both username/email and password.");
-      if (!inputUser) document.getElementById("uname").classList.add("err");
-      if (!inputPass) document.getElementById("upass").classList.add("err");
+    if (!email || !password) {
+      showError("Please enter both email and password.");
+      if (!email)    document.getElementById("uname").classList.add("err");
+      if (!password) document.getElementById("upass").classList.add("err");
       return;
     }
 
-    // ── Resolve user record ─────────────────────────────────────────────────
-    // Admin match is by .username; all others match by .email (case-insensitive)
-    const user = USER_STORE.find(u =>
-      (u.username && u.username === inputUser) ||
-      (u.email    && u.email.toLowerCase() === inputUser.toLowerCase())
-    );
-
-    if (!user) {
-      showError("Invalid username or password. Please try again.");
-      shakeCard();
-      return;
-    }
-
-    // ── isActive check (ASP.NET LockoutEnabled / Node account-status guard) ─
-    if (user.isActive === 0) {
-      showError("This account is disabled. Please contact your instructor.");
-      shakeCard();
-      return;
-    }
-
-    // ── Credential verification ─────────────────────────────────────────────
     btn.disabled = true;
-    loader.classList.add("show");
+    showOverlay("Contacting server…", "");
 
-    let authenticated = false;
+    // ── Cold-start UX: if no response in 4 s, show waiting message ───────
+    const coldTimer = setTimeout(() => {
+      showOverlay(
+        "☕ Waking up the server…",
+        "The API is starting up on Render's free tier.\nThis can take up to 50 seconds — please wait."
+      );
+      animateColdBar();
+    }, COLD_START_THRESHOLD_MS);
+
+    // ── Hard abort at 70 s ────────────────────────────────────────────────
+    const controller  = new AbortController();
+    const hardTimeout = setTimeout(() => controller.abort(), HARD_TIMEOUT_MS);
+
     try {
-      if (user.hashType === "bcrypt") {
-        // bcrypt.compare → async, uses bcryptjs CDN
-        // Mirrors: await bcrypt.compare(password, hash)  [Node.js]
-        //          PasswordHasher.VerifyHashedPassword()  [ASP.NET]
-        authenticated = await bcrypt.compare(inputPass, user.passwordHash);
-      } else {
-        // Plain-text fallback (legacy accounts — userId 1, 8, 9)
-        authenticated = (inputPass === user.password);
+      // POST /api/login → dbo.User lookup + bcrypt.compare() on the server
+      const res = await fetch(API_LOGIN_URL, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ email, password }),
+        signal:  controller.signal
+      });
+
+      clearTimeout(coldTimer);
+      clearTimeout(hardTimeout);
+      stopColdBar();
+
+      const data = await res.json();
+
+      // HTTP 401 or body-level error from Express error handler
+      if (!res.ok || data.error || data.message) {
+        throw new Error(data.error || data.message || "Invalid email or password.");
       }
+
+      // Belt-and-suspenders: block disabled accounts even if API misses it
+      if (data.isActive === 0 || data.isActive === false) {
+        throw new Error("This account is disabled. Please contact your instructor.");
+      }
+
+      // Resolve Authorization Policy for this role
+      const policy = AUTH_POLICIES[data.role];
+      if (!policy) {
+        throw new Error(`Role "${data.role}" has no configured destination. Contact your administrator.`);
+      }
+
+      // ── Write session claims (mirrors JWT payload / ClaimsPrincipal) ─────
+      // Fields map 1-to-1 with dbo.User columns returned by the API
+      sessionStorage.setItem("lms_auth",      "true");
+      sessionStorage.setItem("lms_userId",    String(data.userId));
+      sessionStorage.setItem("lms_email",     data.email     || email);
+      sessionStorage.setItem("lms_firstName", data.firstName || "");
+      sessionStorage.setItem("lms_lastName",  data.lastName  || "");
+      sessionStorage.setItem("lms_role",      data.role);
+      sessionStorage.setItem("lms_isActive",  String(data.isActive));
+
+      // ── Role-based redirect ───────────────────────────────────────────────
+      showOverlay(`✓ Welcome, ${data.firstName}!`, `Signed in as ${data.role} — redirecting…`);
+      setTimeout(() => window.location.href = policy.redirect, 700);
+
     } catch (err) {
-      console.error("[RBAC] Credential verification error:", err);
-      authenticated = false;
-    }
+      clearTimeout(coldTimer);
+      clearTimeout(hardTimeout);
+      stopColdBar();
+      hideOverlay();
+      btn.disabled = false;
 
-    loader.classList.remove("show");
-    btn.disabled = false;
+      const msg = (err.name === "AbortError")
+        ? "The server took too long to respond. Please try again in a moment."
+        : (err.message || "Login failed. Please try again.");
 
-    if (!authenticated) {
-      showError("Invalid username or password. Please try again.");
-      ["uname","upass"].forEach(id => document.getElementById(id).classList.add("err"));
+      showError(msg);
+      document.getElementById("uname").classList.add("err");
+      document.getElementById("upass").classList.add("err");
       shakeCard();
-      return;
     }
-
-    // ── Issue Session Claims ────────────────────────────────────────────────
-    // Simulates JWT payload / ASP.NET ClaimsPrincipal claims:
-    //   ClaimTypes.NameIdentifier, ClaimTypes.Email, ClaimTypes.Role, etc.
-    sessionStorage.setItem("lms_auth",      "true");
-    sessionStorage.setItem("lms_userId",    String(user.userId));
-    sessionStorage.setItem("lms_email",     user.email || "admin@system");
-    sessionStorage.setItem("lms_firstName", user.firstName);
-    sessionStorage.setItem("lms_lastName",  user.lastName);
-    sessionStorage.setItem("lms_role",      user.role);   // RBAC claim
-    sessionStorage.setItem("lms_isActive",  String(user.isActive));
-
-    // ── Role-Based Authorization → Redirect ─────────────────────────────────
-    // Mirrors: [Authorize(Roles = "ADMIN")] on admin-users.html
-    //          [Authorize(Roles = "INSTRUCTOR,STUDENT")] on courses-workspace-demo.html
-    const policy = AUTH_POLICIES[user.role];
-    if (!policy) {
-      showError("Your account role is not configured. Contact your administrator.");
-      return;
-    }
-
-    // Visual feedback before redirect
-    btn.textContent = `✓ Signed in as ${user.firstName} (${user.role})…`;
-    btn.style.background = "var(--green)";
-    setTimeout(() => window.location.href = policy.redirect, 700);
   }
 
-  /* ── UI helpers ─────────────────────────────────────────────────────────── */
+  /* ── Cold-start progress bar ──────────────────────────────────────────── */
+  let coldBarInterval = null;
+
+  function animateColdBar() {
+    const bar  = document.getElementById("coldBar");
+    document.getElementById("coldBarWrap").classList.add("show");
+    let pct = 0;
+    coldBarInterval = setInterval(() => {
+      pct += (90 - pct) * 0.025;      // asymptotically approaches 90 %
+      bar.style.width = pct.toFixed(1) + "%";
+    }, 500);
+  }
+
+  function stopColdBar() {
+    clearInterval(coldBarInterval);
+    const bar  = document.getElementById("coldBar");
+    const wrap = document.getElementById("coldBarWrap");
+    bar.style.width = "100%";
+    setTimeout(() => wrap.classList.remove("show"), 400);
+  }
+
+  /* ── UI helpers ── */
+  function showOverlay(msg, sub) {
+    document.getElementById("overlayMsg").textContent = msg;
+    document.getElementById("overlaySub").textContent = sub;
+    document.getElementById("cardOverlay").classList.add("show");
+  }
+  function hideOverlay() {
+    document.getElementById("cardOverlay").classList.remove("show");
+    document.getElementById("coldBarWrap").classList.remove("show");
+  }
   function showError(msg) {
     document.getElementById("errTxt").textContent = msg;
     document.getElementById("errMsg").classList.add("show");
   }
-
+  function clearErrors() {
+    document.getElementById("errMsg").classList.remove("show");
+    ["uname","upass"].forEach(id => document.getElementById(id).classList.remove("err"));
+  }
   function shakeCard() {
-    const card = document.querySelector(".card");
-    card.style.animation = "none";
-    card.offsetHeight; // reflow
-    card.style.animation = "shake .35s ease";
+    const c = document.querySelector(".card");
+    c.style.animation = "none";
+    c.offsetHeight;
+    c.style.animation = "shake .35s ease";
   }
 
-  /* ── Enter key support ── */
-  ["uname","upass"].forEach(id => {
+  /* ── Enter key ── */
+  ["uname","upass"].forEach(id =>
     document.getElementById(id).addEventListener("keydown", e => {
       if (e.key === "Enter") doLogin();
+    })
+  );
+
+  /* ════════════════════════════════════════════════════════════════════════
+     FORGOT / RESET PASSWORD MODAL
+     ════════════════════════════════════════════════════════════════════════ */
+
+  const API_BASE = "https://daytona-lms-api.onrender.com";
+
+  /* ── On page load: check for ?token= in URL ────────────────────────────
+     If present, the user clicked a reset link from their email.
+     Auto-open the modal on Panel 2 so they can set a new password.     */
+  (function checkResetToken() {
+    const params = new URLSearchParams(window.location.search);
+    const token  = params.get("token");
+    if (token) {
+      window._resetToken = token;
+      // Clean token from URL bar without page reload
+      history.replaceState({}, "", window.location.pathname);
+      openResetPanel();
+    }
+  })();
+
+  /* ── Modal open/close ── */
+  function openForgotModal() {
+    clearModalMessages();
+    showPanel("panelForgot");
+    document.getElementById("modalBackdrop").classList.add("show");
+    setTimeout(() => document.getElementById("resetEmail").focus(), 100);
+  }
+
+  function openResetPanel() {
+    clearModalMessages();
+    showPanel("panelReset");
+    document.getElementById("modalBackdrop").classList.add("show");
+    setTimeout(() => document.getElementById("newPass").focus(), 100);
+  }
+
+  function closeModal() {
+    document.getElementById("modalBackdrop").classList.remove("show");
+    clearModalMessages();
+    // Clear fields
+    ["resetEmail","newPass","confirmPass"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
     });
+    document.getElementById("strengthBar").style.width = "0%";
+    document.getElementById("strengthLabel").textContent = "";
+  }
+
+  // Close on backdrop click
+  document.getElementById("modalBackdrop").addEventListener("click", function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // Close on Escape key
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+  function showPanel(id) {
+    ["panelForgot","panelReset"].forEach(p => {
+      document.getElementById(p).classList.toggle("active", p === id);
+    });
+  }
+
+  function clearModalMessages() {
+    document.getElementById("modalInfo").classList.remove("show");
+    document.getElementById("modalErr").classList.remove("show");
+    document.getElementById("resetEmail") &&
+      document.getElementById("resetEmail").classList.remove("err");
+    document.getElementById("newPass") &&
+      document.getElementById("newPass").classList.remove("err");
+    document.getElementById("confirmPass") &&
+      document.getElementById("confirmPass").classList.remove("err");
+  }
+
+  function showModalInfo(msg) {
+    document.getElementById("modalInfoTxt").textContent = msg;
+    document.getElementById("modalInfo").classList.add("show");
+    document.getElementById("modalErr").classList.remove("show");
+  }
+
+  function showModalErr(msg) {
+    document.getElementById("modalErrTxt").textContent = msg;
+    document.getElementById("modalErr").classList.add("show");
+    document.getElementById("modalInfo").classList.remove("show");
+  }
+
+  /* ── Panel 1: Send reset link ───────────────────────────────────────────
+     POST /api/forgot-password { email }
+     Server looks up email in dbo.User, generates token, sends email.   */
+  async function sendResetLink() {
+    const email = document.getElementById("resetEmail").value.trim();
+    const btn   = document.getElementById("btnSendLink");
+    clearModalMessages();
+
+    if (!email) {
+      document.getElementById("resetEmail").classList.add("err");
+      showModalErr("Please enter your email address.");
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = "Sending…";
+
+    try {
+      const res  = await fetch(`${API_BASE}/api/forgot-password`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ email })
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Request failed.");
+
+      // Always show success — server never reveals if email exists
+      btn.textContent = "Sent ✓";
+      btn.classList.add("success");
+      showModalInfo("Check your .edu inbox — a reset link is on its way. It expires in 1 hour.");
+
+    } catch (err) {
+      btn.disabled    = false;
+      btn.textContent = "Send Reset Link →";
+      showModalErr(err.message || "Could not send reset email. Please try again.");
+    }
+  }
+
+  /* ── Panel 2: Submit new password ──────────────────────────────────────
+     POST /api/reset-password { token, newPassword }
+     Server verifies token, bcrypt-hashes, updates dbo.User.passwordHash. */
+  async function submitNewPassword() {
+    const newPass  = document.getElementById("newPass").value;
+    const confirm  = document.getElementById("confirmPass").value;
+    const btn      = document.getElementById("btnSetPass");
+    const token    = window._resetToken;
+    clearModalMessages();
+
+    if (!token) {
+      showModalErr("Reset token is missing. Please use the link from your email.");
+      return;
+    }
+    if (newPass.length < 8) {
+      document.getElementById("newPass").classList.add("err");
+      showModalErr("Password must be at least 8 characters.");
+      return;
+    }
+    if (newPass !== confirm) {
+      document.getElementById("confirmPass").classList.add("err");
+      showModalErr("Passwords do not match.");
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = "Updating…";
+
+    try {
+      const res  = await fetch(`${API_BASE}/api/reset-password`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ token, newPassword: newPass })
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Reset failed.");
+
+      // Success — show confirmation then close modal after 2.5 s
+      btn.textContent = "Password Updated ✓";
+      btn.classList.add("success");
+      window._resetToken = null;
+      showModalInfo("Password updated! You can now sign in with your new password.");
+      setTimeout(() => closeModal(), 2500);
+
+    } catch (err) {
+      btn.disabled    = false;
+      btn.textContent = "Set New Password →";
+      showModalErr(err.message || "Failed to reset password. The link may have expired.");
+    }
+  }
+
+  /* ── Password strength indicator ────────────────────────────────────── */
+  function checkStrength(val) {
+    const bar   = document.getElementById("strengthBar");
+    const label = document.getElementById("strengthLabel");
+    let score = 0;
+    if (val.length >= 8)  score++;
+    if (val.length >= 12) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const levels = [
+      { w:"0%",   bg:"",          txt:"" },
+      { w:"25%",  bg:"#ef4444",   txt:"Weak" },
+      { w:"50%",  bg:"#f97316",   txt:"Fair" },
+      { w:"75%",  bg:"#eab308",   txt:"Good" },
+      { w:"90%",  bg:"#22c55e",   txt:"Strong" },
+      { w:"100%", bg:"#16a34a",   txt:"Very strong" },
+    ];
+    const lvl = levels[Math.min(score, 5)];
+    bar.style.width      = lvl.w;
+    bar.style.background = lvl.bg;
+    label.textContent    = lvl.txt;
+    label.style.color    = lvl.bg;
+  }
+
+  /* ── Toggle visibility for new/confirm password fields ── */
+  function togglePw2() {
+    const f = document.getElementById("newPass");
+    f.type = (f.type === "password") ? "text" : "password";
+  }
+  function togglePw3() {
+    const f = document.getElementById("confirmPass");
+    f.type = (f.type === "password") ? "text" : "password";
+  }
+
+  /* ── Enter key in modal fields ── */
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("resetEmail")
+      .addEventListener("keydown", e => { if (e.key === "Enter") sendResetLink(); });
+    document.getElementById("confirmPass")
+      .addEventListener("keydown", e => { if (e.key === "Enter") submitNewPassword(); });
   });
 </script>
 </body>
