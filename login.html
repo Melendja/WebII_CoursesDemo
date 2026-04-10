@@ -458,12 +458,8 @@
         <button class="reset-modal-close" onclick="closeResetRequestModal()">&times;</button>
       </div>
       <div class="reset-modal-body">
-        <p>To reset your password, please contact your course instructor or system administrator. They can set a new password for your account directly from the admin panel.</p>
-        <div class="contact-box">
-          📧 Contact: <a href="mailto:jose_melendez4701@daytonastate.edu"
-             style="color:inherit">jose_melendez4701@daytonastate.edu</a>
-        </div>
-        <button class="btn-close-reset" onclick="closeResetRequestModal()">Got it</button>
+        <p>Your System Administrator will be contacted shortly.</p>
+        <button class="btn-close-reset" id="btnGotIt" onclick="sendResetRequest()">Got it</button>
       </div>
     </div>
   </div>
@@ -687,6 +683,24 @@
   }
   function closeResetRequestModal() {
     document.getElementById("resetRequestBackdrop").classList.remove("show");
+  }
+  function sendResetRequest() {
+    // Get the email the user typed in the login form
+    const userEmail = document.getElementById("uname").value.trim() || "unknown user";
+
+    const to      = "jose_melendez4701@daytonastate.edu";
+    const subject = encodeURIComponent("Password Reset Request");
+    const body    = encodeURIComponent(
+      "The following user has submitted a request to reset their password:\n\n" +
+      "Email: " + userEmail + "\n\n" +
+      "Please log in to the Admin Panel to set a new password for this account."
+    );
+
+    // Open the user's email client with pre-filled fields
+    window.location.href = "mailto:" + to + "?subject=" + subject + "&body=" + body;
+
+    // Close the modal after a short delay
+    setTimeout(closeResetRequestModal, 500);
   }
   document.getElementById("resetRequestBackdrop").addEventListener("click", function(e) {
     if (e.target === this) closeResetRequestModal();
