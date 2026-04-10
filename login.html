@@ -307,6 +307,9 @@
     }
     .btn-close-reset:hover { background: var(--navy-dk); }
   </style>
+  <!-- EmailJS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init("UU0wAN8_YGmkWAhpe");</script>
 </head>
 <body>
 
@@ -459,6 +462,12 @@
       </div>
       <div class="reset-modal-body">
         <p>Your System Administrator will be contacted shortly.</p>
+        <div class="modal-info" id="resetSuccess" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;padding:10px 14px;font-size:12.5px;color:#15803d;font-weight:600;margin-bottom:12px;">
+          ✅ Request sent! Your administrator has been notified.
+        </div>
+        <div class="modal-err" id="resetError" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:5px;padding:10px 14px;font-size:12.5px;color:#dc2626;font-weight:600;margin-bottom:12px;">
+          ⚠️ Could not send request. Please email jose_melendez4701@daytonastate.edu directly.
+        </div>
         <button class="btn-close-reset" id="btnGotIt" onclick="sendResetRequest()">Got it</button>
       </div>
     </div>
@@ -685,22 +694,40 @@
     document.getElementById("resetRequestBackdrop").classList.remove("show");
   }
   function sendResetRequest() {
-    // Get the email the user typed in the login form
-    const userEmail = document.getElementById("uname").value.trim() || "unknown user";
+    var userEmail = document.getElementById("uname").value.trim() || "unknown";
+    var btn       = document.getElementById("btnGotIt");
+    var successEl = document.getElementById("resetSuccess");
+    var errorEl   = document.getElementById("resetError");
 
-    const to      = "jose_melendez4701@daytonastate.edu";
-    const subject = encodeURIComponent("Password Reset Request");
-    const body    = encodeURIComponent(
-      "The following user has submitted a request to reset their password:\n\n" +
-      "Email: " + userEmail + "\n\n" +
-      "Please log in to the Admin Panel to set a new password for this account."
-    );
+    // Hide any previous feedback
+    successEl.style.display = "none";
+    errorEl.style.display   = "none";
 
-    // Open the user's email client with pre-filled fields
-    window.location.href = "mailto:" + to + "?subject=" + subject + "&body=" + body;
+    // Disable button and show sending state
+    btn.disabled    = true;
+    btn.textContent = "Sending…";
 
-    // Close the modal after a short delay
-    setTimeout(closeResetRequestModal, 500);
+    emailjs.send(
+      "service_04deom4",    // EmailJS Service ID
+      "template_v70an4p",   // EmailJS Template ID
+      { user_email: userEmail }
+    ).then(function() {
+      // Success
+      successEl.style.display = "block";
+      btn.textContent = "Done";
+      setTimeout(function() {
+        closeResetRequestModal();
+        btn.disabled    = false;
+        btn.textContent = "Got it";
+        successEl.style.display = "none";
+      }, 2500);
+    }, function(error) {
+      // Failure — show fallback message
+      console.error("EmailJS error:", error);
+      errorEl.style.display = "block";
+      btn.disabled    = false;
+      btn.textContent = "Got it";
+    });
   }
   document.getElementById("resetRequestBackdrop").addEventListener("click", function(e) {
     if (e.target === this) closeResetRequestModal();
